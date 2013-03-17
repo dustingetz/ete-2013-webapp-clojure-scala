@@ -13,7 +13,7 @@ require([
         , splashF, skillsF, createProjectF, projectsF)
     {
         // api is private; only this page knows how to manage the data.
-        var api = new API('.'); // can't change origin (e.g. port) here; Access-Control-Allow-Origin will break mock mode
+        var api = new API('../'); // can't change origin (e.g. port) here; Access-Control-Allow-Origin will break mock mode
         var login = loginF.make(t.snippet($, 'login'));
         var register = registerF.make(t.snippet($, 'register'));
         var createProject = createProjectF.make(t.snippet($, 'create-project'));

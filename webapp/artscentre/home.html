@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <title></title>
+        <title>Artscentre</title>
         <meta charset="utf-8"/>
         <link rel="stylesheet" href="../vendor/bootstrap/bootstrap.css" />
         <style>
@@ -38,10 +38,11 @@
         <script type="text/javascript">_.mixin(_.string.exports());</script>
         <script type="text/javascript" src="../vendor/bootstrap/bootstrap.js"></script>
         <script type="text/javascript" src="../vendor/backbone.js"></script>
-
-        <script type="text/javascript" src="../api.js"></script>
-
+        <script type="text/javascript" src="../vendor/json2.js"></script>
+        <script type="text/javascript" src="../vendor/jquery.mockjax.js"></script>
         <script type="text/javascript" src="../vendor/require/require-2.1.4-debug.js"></script>
+
+        <script type="text/javascript" src="../api.js"></script><!-- should be via require -->
         <script>
             (function(){
                 "use strict";
@@ -55,8 +56,23 @@
                     //,urlArgs: "bust=" + (new Date()).getTime()    // cache busting prevents breakpoints from being preserved across refresh.
                 });
 
+
+                // mock out the services for frontend development
+                $.mockjax(function(settings) {
+                    var service = settings.url.match(/\/api\/todos$/);
+                    var httpVerb = settings.type.toLowerCase();
+
+                    if (service && httpVerb === 'get') {
+                        return {
+                            contentType: 'text/json',
+                            responseTime: 1000,
+                            proxy: '/todos/mocks/Todos.json'
+                        };
+                    }
+                });
+
                 // entry point
-                require(['projects/home'], function(projects) {});
+                require(['artscentre/home'], function(projects) {});
 
             })();
         </script>
