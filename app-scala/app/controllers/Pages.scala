@@ -4,9 +4,10 @@ import play.api._
 import play.api.mvc._
 import jp.t2v.lab.play2.auth.Auth
 import java.io.File
+import controllers.auth.{PageAuthConfig, NormalUser}
 
 
-object Pages extends Controller with Auth with AuthConfigImpl {
+object Pages extends Controller with Auth with PageAuthConfig {
 
   // should be externalized to a setting; this constant is
   // also inlined in the routes file for global assets
