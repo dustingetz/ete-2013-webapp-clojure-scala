@@ -31,7 +31,7 @@ object Pages extends Controller with Auth with PageAuthConfig {
 
 
   def artscentre = authorizedAction(NormalUser) { user => implicit request =>
-    externalAsset("artscentre", "home.html")
+    externalAsset("artscentre", "index.html")
   }
 
 }

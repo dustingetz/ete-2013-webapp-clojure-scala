@@ -56,21 +56,6 @@
                     //,urlArgs: "bust=" + (new Date()).getTime()    // cache busting prevents breakpoints from being preserved across refresh.
                 });
 
-
-                // mock out the services for frontend development
-                $.mockjax(function(settings) {
-                    var service = settings.url.match(/\/api\/whoami$/);
-                    var httpVerb = settings.type.toLowerCase();
-
-                    if (service && httpVerb === 'get') {
-                        return {
-                            contentType: 'text/json',
-                            responseTime: 1000,
-                            proxy: '/artscentre/mocks/whoami.json'
-                        };
-                    }
-                });
-
                 // entry point
                 require(['artscentre/home'], function(projects) {});
 
