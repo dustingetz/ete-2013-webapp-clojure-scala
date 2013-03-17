@@ -59,14 +59,14 @@
 
                 // mock out the services for frontend development
                 $.mockjax(function(settings) {
-                    var service = settings.url.match(/\/api\/todos$/);
+                    var service = settings.url.match(/\/api\/whoami$/);
                     var httpVerb = settings.type.toLowerCase();
 
                     if (service && httpVerb === 'get') {
                         return {
                             contentType: 'text/json',
                             responseTime: 1000,
-                            proxy: '/todos/mocks/Todos.json'
+                            proxy: '/artscentre/mocks/whoami.json'
                         };
                     }
                 });
