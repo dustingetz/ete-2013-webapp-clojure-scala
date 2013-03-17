@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>projects</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta charset="utf-8"/>
+	<meta name="author" content="jfeingold"/>
+	<meta name="description" content="faceted search panel for projects."/>
+	<link href="../css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+	<div data-snippet="template">
+		<h2>Projects [<span data-snippet="count">0</span>]</h2>
+		<div class="btn-group" data-toggle="buttons-radio">
+			<button data-snippet="owned" type="button" class="btn">Owned</button>
+			<button data-snippet="joined" type="button" class="btn">Joined</button>
+			<button data-snippet="eligible" type="button" class="btn">Eligible</button>
+		</div>
+		<button data-snippet="create" type="button" class="btn btn-primary">Create</button>
+		<div data-snippet="projects">
+			<div data-snippet="project">
+				<div class="row"><button data-snippet="action" type="button" class="btn">[action]</button> [<span data-snippet="nth">1</span>]<span class="lead" data-snippet="name">Project Mayhem</span>: <span data-snippet="owner">Tyler Durden</span></div>
+				<div>skills: <span data-snippet="skills"><span data-snippet="skill">Explosives</span></span></div>
+				<div>members: <span data-snippet="members"><span data-snippet="member">Marla Singer</span></span></div>
+			</div>
+		</div>
+	</div>
+</div>
+<script type="text/javascript" src="../js/bootstrap.js"></script>
+</body>
+</html>

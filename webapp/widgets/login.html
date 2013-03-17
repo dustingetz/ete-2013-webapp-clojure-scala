@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>template: login form</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta charset="utf-8"/>
+	<meta name="author" content="jfeingold"/>
+	<meta name="description" content="html for login dialog"/>
+	<link href="../css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+	<div data-snippet="login" class="modal fade in">
+		<form>
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">×</a>
+				<h3>Login</h3>
+			</div>
+			<div class="modal-body">
+				<div data-snippet="biffed" class="alert alert-error">
+					<strong>Warning!</strong> Invalid username or password.
+				</div>
+				<input type="text" data-snippet="username" class="input-block-level" placeholder="User Name"/>
+				<input type="password" data-snippet="password" class="input-block-level" placeholder="Password"/>
+				<label class="checkbox">
+					<input type="checkbox" data-snippet="remember" value="remember-me"/> Remember me
+				</label>
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-success" data-snippet="ok">Login</a>
+				<a href="#" class="btn" data-dismiss="modal" data-snippet="cancel">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/bootstrap.js"></script>
+</body>
+</html>

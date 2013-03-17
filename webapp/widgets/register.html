@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>template: registration form</title>
+	<meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+	<meta charset="utf-8"/>
+	<meta name="author" content="jfeingold"/>
+	<meta name="description" content="html for registration dialog"/>
+	<link href="../css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+<div class="container">
+	<div data-snippet="register" class="modal fade in">
+		<form>
+			<div class="modal-header">
+				<a class="close" data-dismiss="modal">×</a>
+				<h3>Register</h3>
+			</div>
+			<div class="modal-body">
+				<input type="text" data-snippet="first-name" class="input-block-level" placeholder="First Name">
+				<input type="text" data-snippet="last-name" class="input-block-level" placeholder="Last Name">
+				<input type="text" data-snippet="e-mail" class="input-block-level" placeholder="E-Mail Address">
+				<input type="text" data-snippet="username" class="input-block-level" placeholder="User Name">
+				<input type="password" data-snippet="password-1" class="input-block-level" placeholder="Password">
+				<input type="password" data-snippet="password-2" class="input-block-level" placeholder="Password (Again)">
+			</div>
+			<div class="modal-footer">
+				<a href="#" class="btn btn-success" data-snippet="ok">Register</a>
+				<a href="#" class="btn" data-dismiss="modal" type="submit" data-snippet="cancel">Cancel</a>
+			</div>
+		</form>
+	</div>
+</div>
+<script type="text/javascript" src="../js/jquery-1.8.3.js"></script>
+<script type="text/javascript" src="../js/bootstrap.js"></script>
+</body>
+</html>

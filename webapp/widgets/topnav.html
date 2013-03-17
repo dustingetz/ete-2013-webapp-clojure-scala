@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>template: topnav</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta charset="utf-8">
+    <meta name="author" content="jfeingold">
+    <meta name="description" content="top navigation bar">
+	<link href="../css/bootstrap.css" rel="stylesheet"/>
+</head>
+<body>
+<!-- must have container div or the template system won't find the snippet! -->
+<div class="container">
+	<div data-snippet="topnav" class="navbar navbar-inverse navbar-fixed-top">
+		<div class="navbar-inner">
+			<div class="container">
+				<span><a class="brand active" data-snippet="main" href="#">Artscentre</a></span>
+				<div class="nav-collapse collapse">
+					<ul data-snippet="link-panel" class="nav">
+						<li><a data-snippet="skills" href="#/skills">Skills</a></li>
+						<li><a data-snippet="projects" href="#/projects">Projects</a></li>
+						<!--
+						<li class="dropdown">
+							<a href="#" class="dropdown-toggle" data-toggle="dropdown">Projects <b class="caret"></b></a>
+							<ul class="dropdown-menu">
+								<li><a data-snippet="projects-owned" href="#/projects/owned">Owned</a></li>
+								<li><a data-snippet="projects-joined" href="#/projects/joined">Joined</a></li>
+								<li><a data-snippet="projects-eligible" href="#/projects/eligible">Eligible</a></li>
+								<li><a data-snippet="project-create" href="#">Create...</a></li>
+							</ul>
+						</li>
+						-->
+					</ul>
+					<ul data-snippet="usermenu" class="nav pull-right">
+						<li id="fat-menu" class="dropdown">
+							<a href="#" id="drop3" role="button" class="dropdown-toggle" data-toggle="dropdown">
+								<span data-snippet="username">User@Company.com</span>
+								<b class="caret"></b></a>
+							<ul class="dropdown-menu" role="menu" aria-labelledby="drop3">
+								<li><a data-snippet="manage-account" tabindex="-1" href="#">Manage Account</a></li>
+								<li class="divider"></li>
+								<li><a data-snippet="logout" tabindex="-1" href="#">Log out</a></li>
+							</ul>
+						</li>
+					</ul>
+					<ul data-snippet="nonusermenu" class="nav pull-right">
+						<li><a id="link-panel-register" data-snippet="register" href="#">Register</a></li>
+						<li><a id="link-panel-login" data-snippet="login" href="#">Login</a></li>
+					</ul>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+<!-- SCRIPTS -->
+<script src="../js/jquery-1.8.3.js"></script>
+<script src="../js/bootstrap.js"></script>
+</body>
+</html>
