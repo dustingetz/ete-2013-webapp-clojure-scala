@@ -5,7 +5,8 @@
 function API(root)
 {
 	// converts the relative url of the call to an absolute-ish url.
-	function url(path) { return root + '/api' + path }
+	function url(path) { return root + 'api' + path }
+
 	this.auth = function(username, password)
 	{
 		return postForm(url('/login'), { 'username': username, 'password': password });
