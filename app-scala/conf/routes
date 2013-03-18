@@ -1,7 +1,8 @@
 GET     /login      controllers.Authentication.loginPage
 POST    /login      controllers.Authentication.doLogin
 
-GET     /api/whoami       controllers.Api.whoami
+GET     /api/whoami                         controllers.Api.whoami
+GET     /api/list-skills-user-picker        controllers.Api.skills
 
 GET     /test/hello       controllers.Test.hello
 GET     /test/sayHello    controllers.Test.sayHello

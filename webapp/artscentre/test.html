@@ -71,6 +71,19 @@
             }
         });
 
+        $.mockjax(function(settings) {
+            var service = settings.url.match(/\/api\/list-skills-user-picker/);
+            var httpVerb = settings.type.toLowerCase();
+
+            if (service && httpVerb === 'get') {
+                return {
+                    contentType: 'text/json',
+                    responseTime: 1000,
+                    proxy: '/artscentre/mocks/skills_dustingetz.json'
+                };
+            }
+        });
+
         // entry point
         require(['artscentre/home'], function(projects) {});
 

@@ -16,7 +16,7 @@ object SkillsMapping {
     get[ID]("skills.id") ~
     get[String]("skills.name") map(flatten)
 
-  def list(): Map[ID, Skill] = {
+  def all(): Map[ID, Skill] = {
     DB.withConnection { implicit connection =>
       val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)
       raw.view.map { t => t._1 -> Skill(t._2) }.toMap
@@ -58,6 +58,20 @@ object SkillsMapping {
       .on('id -> id)
       .executeUpdate()
       //assert count == 1
+    }
+  }
+
+  def forUser(userId: ID): Map[ID, Skill] = {
+    DB.withConnection { implicit connection =>
+      val raw: List[(ID, String)] = SQL(
+        """
+          |SELECT skills.id, skills.name FROM skills
+          |INNER JOIN skillsets
+          |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
+        """.stripMargin)
+        .on('userId -> userId)
+        .as(directMapping *)
+      raw.view.map { t => t._1 -> Skill(t._2) }.toMap
     }
   }
 }

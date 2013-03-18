@@ -17,3 +17,10 @@ case class Skill(name: String)
 case class Project(name: String, ownercreated: Long)
 
 case class ProjectInfo(name: String, owner: User, created: Long, members: List[User], skills: List[Skill])
+
+
+object Implicits {
+  import play.api.libs.json._
+
+  implicit val skillFmt = Json.format[Skill]
+}

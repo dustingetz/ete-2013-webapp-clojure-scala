@@ -1,5 +1,142 @@
-[{
-    id: '',
-    name: '',
-    enabled: true
-}]
+[
+    {
+        "id": 3,
+        "name": "Android Developer",
+        "enabled": true
+    },
+    {
+        "id": 20,
+        "name": "Bass",
+        "enabled": true
+    },
+    {
+        "id": 19,
+        "name": "Cello",
+        "enabled": false
+    },
+    {
+        "id": 25,
+        "name": "Choreographer",
+        "enabled": false
+    },
+    {
+        "id": 13,
+        "name": "Clarinet",
+        "enabled": false
+    },
+    {
+        "id": 4,
+        "name": "Classical Guitar",
+        "enabled": true
+    },
+    {
+        "id": 6,
+        "name": "Classical Piano",
+        "enabled": false
+    },
+    {
+        "id": 8,
+        "name": "Composer",
+        "enabled": false
+    },
+    {
+        "id": 9,
+        "name": "Conductor",
+        "enabled": true
+    },
+    {
+        "id": 24,
+        "name": "Dancer",
+        "enabled": false
+    },
+    {
+        "id": 28,
+        "name": "Director",
+        "enabled": false
+    },
+    {
+        "id": 16,
+        "name": "English Horn",
+        "enabled": false
+    },
+    {
+        "id": 11,
+        "name": "Graphic Designer",
+        "enabled": false
+    },
+    {
+        "id": 15,
+        "name": "Horn",
+        "enabled": true
+    },
+    {
+        "id": 5,
+        "name": "Jazz Guitar",
+        "enabled": false
+    },
+    {
+        "id": 7,
+        "name": "Jazz Piano",
+        "enabled": false
+    },
+    {
+        "id": 27,
+        "name": "Lighting Designer",
+        "enabled": false
+    },
+    {
+        "id": 2,
+        "name": "Objective C Developer",
+        "enabled": false
+    },
+    {
+        "id": 12,
+        "name": "Oboe",
+        "enabled": false
+    },
+    {
+        "id": 22,
+        "name": "Painter",
+        "enabled": false
+    },
+    {
+        "id": 10,
+        "name": "Photographer",
+        "enabled": false
+    },
+    {
+        "id": 26,
+        "name": "Producer",
+        "enabled": false
+    },
+    {
+        "id": 23,
+        "name": "Sculptor",
+        "enabled": false
+    },
+    {
+        "id": 14,
+        "name": "Trumpet",
+        "enabled": false
+    },
+    {
+        "id": 21,
+        "name": "Video Editor",
+        "enabled": false
+    },
+    {
+        "id": 17,
+        "name": "Viola",
+        "enabled": false
+    },
+    {
+        "id": 18,
+        "name": "Violin",
+        "enabled": false
+    },
+    {
+        "id": 1,
+        "name": "Web Designer",
+        "enabled": false
+    }
+]
