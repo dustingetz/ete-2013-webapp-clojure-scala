@@ -3,6 +3,7 @@ POST    /login      controllers.Authentication.doLogin
 
 GET     /api/whoami                         controllers.Api.whoami
 GET     /api/list-skills-user-picker        controllers.Api.listSkillsUserPicker
+POST    /api/update-user-skills             controllers.Api.updateUserSkills
 
 GET     /test/hello       controllers.Test.hello
 GET     /test/sayHello    controllers.Test.sayHello

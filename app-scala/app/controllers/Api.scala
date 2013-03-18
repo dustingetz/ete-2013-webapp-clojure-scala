@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
-import orm.SkillsMapping
+import orm.{SkillsetMapping, SkillsMapping}
 import models.Skill
 
 
@@ -35,6 +35,12 @@ object Api extends Controller with Auth with ServiceAuthConfig {
     }
 
     Ok(Json.toJson(payload))
+  }
+
+
+  def updateUserSkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>
+    val b: JsValue = request.body
+    b.asOpt[List[String]].map { SkillsetMapping.updateUserSkills(user, _) }.map { _ => Ok } getOrElse (BadRequest)
   }
 
 }
