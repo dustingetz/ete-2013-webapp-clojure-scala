@@ -59,16 +59,8 @@
 
         // mock out the services for frontend development
         $.mockjaxSettings = {
-            status:        200,
-            responseTime:  1000,
-            isTimeout:     false,
-            contentType:   'text/json',
-            response:      '',
-            responseText:  '',
-            responseXML:   '',
-            proxy:         '',
-            lastModified:  null,
-            etag:          ''
+            responseTime:  1000
+            ,contentType:   'text/json'
         };
 
         $.mockjax({
@@ -86,6 +78,7 @@
         $.mockjax({
             url: /\/api\/update-user-skills$/
             ,type: 'POST'
+            ,status: 200
             ,responseText: ''
         });
 
