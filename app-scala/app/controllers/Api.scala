@@ -25,7 +25,7 @@ object Api extends Controller with Auth with ServiceAuthConfig {
   private case class SkillPayload(id: String, name: String, enabled: Boolean)
   private implicit val skillPayloadFmt = Json.format[SkillPayload]
 
-  def skills = authorizedAction(NormalUser) { user => implicit request =>
+  def listSkillsUserPicker = authorizedAction(NormalUser) { user => implicit request =>
     val userSkills: Map[String, Skill] = SkillsMapping.forUser(user)
     val allSkills: Map[String, Skill] = SkillsMapping.all()
 
