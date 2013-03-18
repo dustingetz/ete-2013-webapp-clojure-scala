@@ -1,5 +1,7 @@
+import models.Skill
 import play.api.Play
 import play.api.test.FakeApplication
+import java.util.UUID.randomUUID
 
 object dataloader {
 
@@ -31,14 +33,14 @@ object dataloader {
     "Choreographer",
     "Producer",
     "Lighting Designer",
-    "Director",
+    "Director"
   )
 
 
   def main(args: Array[String]) {
     Play.start(FakeApplication())
 
-    //skills.foreach(create)
+    skills.foreach{ skillName => orm.SkillsMapping.create(randomUUID().toString, Skill(skillName)) }
 
     Play.stop()
   }

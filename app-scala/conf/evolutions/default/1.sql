@@ -2,9 +2,9 @@
 
 CREATE TABLE users
 (
-  id serial,
+  id VARCHAR(36) NOT NULL,
   username character varying(64) not null unique,
-  password character varying(64) not null,
+  -- password character varying(64) not null, -- pretend that passwords are managed elsewhere
   email character varying(128) not null,
   firstname character varying(64) not null,
   lastname character varying(64) not null,
@@ -16,7 +16,7 @@ ALTER TABLE users ADD CONSTRAINT users_pk0 PRIMARY KEY (id);
 
 CREATE TABLE skills
 (
-  id serial,
+  id VARCHAR(36) NOT NULL,
   name character varying(128) not null
 );
 
@@ -26,8 +26,8 @@ ALTER TABLE skills ADD CONSTRAINT skills_unique0 UNIQUE (name);
 
 CREATE TABLE skillsets
 (
-  user_id int not null,
-  skill_id int not null
+  user_id VARCHAR(36) NOT NULL,
+  skill_id VARCHAR(36) NOT NULL
 );
 
 ALTER TABLE skillsets ADD CONSTRAINT skillsets_fk0 FOREIGN KEY (user_id) REFERENCES users(id);
@@ -37,8 +37,8 @@ ALTER TABLE skillsets ADD CONSTRAINT skillsets_unique0 UNIQUE (user_id, skill_id
 
 CREATE TABLE projects
 (
-  "id" serial,
-  "owner" int not null,
+  "id" VARCHAR(36) NOT NULL,
+  "owner" VARCHAR(36) NOT NULL,
   "name" character varying(64) not null,
   "created" timestamp not null DEFAULT now()
 );
@@ -49,8 +49,8 @@ ALTER TABLE projects ADD CONSTRAINT projects_fk0 FOREIGN KEY (owner) REFERENCES 
 
 CREATE TABLE project_members
 (
-  "project_id" int not null,
-  "user_id" int not null,
+  "project_id" VARCHAR(36) NOT NULL,
+  "user_id" VARCHAR(36) NOT NULL,
   "created" timestamp not null DEFAULT now()
 );
 
@@ -61,8 +61,8 @@ ALTER TABLE project_members ADD CONSTRAINT project_members_unique0 UNIQUE (proje
 
 CREATE TABLE project_skills
 (
-  "project_id" int not null,
-  "skill_id" int not null
+  "project_id" VARCHAR(36) NOT NULL,
+  "skill_id" VARCHAR(36) NOT NULL
 );
 
 ALTER TABLE project_skills ADD CONSTRAINT project_skills_fk0 FOREIGN KEY (project_id) REFERENCES projects(id);
