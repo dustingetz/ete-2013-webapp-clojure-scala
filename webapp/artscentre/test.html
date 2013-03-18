@@ -58,43 +58,35 @@
 
 
         // mock out the services for frontend development
-        $.mockjax(function(settings) {
-            var service = settings.url.match(/\/api\/whoami$/);
-            var httpVerb = settings.type.toLowerCase();
+        $.mockjaxSettings = {
+            status:        200,
+            responseTime:  1000,
+            isTimeout:     false,
+            contentType:   'text/json',
+            response:      '',
+            responseText:  '',
+            responseXML:   '',
+            proxy:         '',
+            lastModified:  null,
+            etag:          ''
+        };
 
-            if (service && httpVerb === 'get') {
-                return {
-                    contentType: 'text/json',
-                    responseTime: 1000,
-                    proxy: '/artscentre/mocks/whoami.json'
-                };
-            }
+        $.mockjax({
+            url: /\/api\/whoami$/
+            ,type: 'GET'
+            ,proxy: '/artscentre/mocks/whoami.json'
         });
 
-        $.mockjax(function(settings) {
-            var service = settings.url.match(/\/api\/list-skills-user-picker/);
-            var httpVerb = settings.type.toLowerCase();
-
-            if (service && httpVerb === 'get') {
-                return {
-                    contentType: 'text/json',
-                    responseTime: 1000,
-                    proxy: '/artscentre/mocks/skills_dustingetz.json'
-                };
-            }
+        $.mockjax({
+            url: /\/api\/list-skills-user-picker$/
+            ,type: 'GET'
+            ,proxy: '/artscentre/mocks/skills_dustingetz.json'
         });
 
-        $.mockjax(function(settings) {
-            var service = settings.url.match(/\/api\/update-user-skills/);
-            var httpVerb = settings.type.toLowerCase();
-
-            if (service && httpVerb === 'post') {
-                return {
-                    contentType: 'text/json',
-                    responseTime: 1000,
-                    responseText: '' // blank, but 200 OK
-                };
-            }
+        $.mockjax({
+            url: /\/api\/update-user-skills$/
+            ,type: 'POST'
+            ,responseText: ''
         });
 
         // entry point
