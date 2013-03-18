@@ -18,7 +18,7 @@ object Pages extends Controller with Auth with PageAuthConfig {
    * because the play provided version doesn't work with play2auth. This is probably a valid
    * issue in play and should be reported.
    */
-  def externalAsset(rootPath: String, file: String)(implicit request: Request[AnyContent]): Result = {
+  def streamExternalAsset(rootPath: String, file: String)(implicit request: Request[AnyContent]): Result = {
     import play.api.Play.current
     val fileToServe = new File(Play.application.getFile(magicExternalAssetDir + rootPath), file)
 
@@ -31,7 +31,7 @@ object Pages extends Controller with Auth with PageAuthConfig {
 
 
   def artscentre = authorizedAction(NormalUser) { user => implicit request =>
-    externalAsset("artscentre", "index.html")
+    streamExternalAsset("artscentre", "index.html")
   }
 
 }
