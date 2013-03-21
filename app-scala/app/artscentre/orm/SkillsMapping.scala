@@ -17,7 +17,7 @@ object SkillsMapping {
     get[String]("skills.name") map(flatten)
 
   def all(dbconn: java.sql.Connection): Map[ID, Skill] = {
-    val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)
+    val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)(dbconn)
     raw.view.map { t => t._1 -> Skill(t._2) }.toMap
   }
 
@@ -67,7 +67,7 @@ object SkillsMapping {
         |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
       """.stripMargin)
       .on('userId -> userId)
-      .as(directMapping *)
+      .as(directMapping *)(dbconn)
     raw.view.map { t => t._1 -> Skill(t._2) }.toMap
   }
 }

@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
-import artscentre.orm.{SkillsetMapping, SkillsMapping}
+import artscentre.orm.{ProjectMapping, SkillsetMapping, SkillsMapping}
 import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB
@@ -52,53 +52,81 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
 
 
   def updateUserSkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+
       val b: JsValue = request.body
-      b.asOpt[List[String]].map { SkillsetMapping.updateUserSkills(dbconn, user, _) }.map { _ => Ok } getOrElse (BadRequest)
-    }
+      b.asOpt[List[String]].map {
+
+        DB.withConnection { implicit dbconn =>
+          SkillsetMapping.updateUserSkills(dbconn, user, _)
+        }
+
+      } match {
+        case Some(_) => Ok
+        case None => BadRequest("malformed request body")
+      }
   }
 
-
-  def listAllSkills = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
-
-      val allSkills: Map[String, Skill] = SkillsMapping.all(dbconn)
-
-      val payload = ???
-
-      Ok(Json.toJson(payload))
-    }
-  }
-
-  def listUserSkills = authorizedAction(NormalUser) { user => implicit request =>
-    ???
-  }
 
   def createProject = authorizedAction(parse.json, NormalUser) { user => implicit request =>
-    ???
+
+    // owner: Int, name: String, skills: Seq[Int]
+    // {"name":"dustin's project","skills":[3,19,13]}
+
+    val owner: String = user
+    val projectName: String = "dustin's project"
+    val skills: Seq[Int] = List(3, 19, 13)
+
+    DB.withConnection { implicit dbconn =>
+
+      // unnecessary, there is a database constraint
+      if (ProjectMapping.getProjectByName(dbconn, projectName).isDefined) {
+        return BadRequest("project %s already exists".format(projectName))
+      }
+
+      ProjectMapping.createProject(dbconn, owner, projectName)
+
+      val projectId = ProjectMapping.getProjectByName(dbconn, projectName).getOrElse(sys.error("Cannot find project named \""+projectName+"\".")).id
+
+      skills.foreach(skillId => ProjectMapping.addProjectSkill(dbconn, projectId, skillId))
+
+    }
+
+    Ok
   }
 
   def projectAddMember = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 
   def projectRemoveMember = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 
   def deleteProject = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 
   def listOwnedProjects = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 
   def listJoindProjects = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 
   def listElligibleProjects = authorizedAction(NormalUser) { user => implicit request =>
+    DB.withConnection { implicit dbconn =>
+    }
     ???
   }
 

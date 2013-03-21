@@ -1,12 +1,55 @@
 package artscentre.orm
 
-import java.sql.{ResultSet, Connection}
-import artscentre.legacy.Util
-import artscentre.models.{Skill, User, ProjectInfo, Project}
+import anorm.SqlParser._
+import anorm._
+import artscentre.models.{UserInfo, Project}
+
 
 object ProjectMapping {
 
-//  private def selectProjects(connection: Connection, by: String, params: Either[Any,Int]*) =
+  private val directMapping =
+    get[String]("projects.id") ~
+    get[String]("projects.owner") ~
+    get[String]("projects.name") ~
+    get[java.util.Date]("projects.created") map(flatten)
+
+
+  def createProject(dbconn: java.sql.Connection, owner: String, name: String): Option[Project] = {
+
+    val count = SQL("insert into projects (id, owner, name) values ({id}, {owner}, {name})")
+      .on('owner -> owner, 'name -> name)
+      .executeUpdate()(dbconn)
+    // assert count == 1
+
+    // have to read back because created time is set in database
+    getProjectByName(dbconn, name)
+  }
+
+
+  def getProjectByName(dbconn: java.sql.Connection, projectName: String): Option[Project] = {
+
+    val raw: List[(String, String, String, java.util.Date)] = SQL(
+      """
+        |SELECT id, name, owner, created FROM projects WHERE name = {projectName}
+      """.stripMargin)
+      .on('projectName -> projectName)
+      .as(directMapping *)(dbconn)
+
+    raw.view.map { t => Project(t._2, t._3, t._4) }.headOption
+  }
+
+
+  def addProjectSkill(dbconn: java.sql.Connection, projectId: Int, skillId: Int) {
+
+    val count = SQL("insert into project_skills (project_id, skill_id) values ({projectId}, {skillId})")
+      .on('projectId -> projectId, 'skillId -> skillId)
+      .executeUpdate()(dbconn)
+    // assert count == 1
+
+  }
+
+
+  //  private def selectProjects(connection: Connection, by: String, params: Either[Any,Int]*) =
 //  {
 //    val sql = "select distinct p.id, p.name, p.owner, p.created from "+qname("projects")+" p"+(if (null == by || by.isEmpty) "" else (" "+by))+" order by name asc"
 //    Util.decorate(sql)
@@ -26,23 +69,6 @@ object ProjectMapping {
 
 
 
-
-//  def createProject(connection: Connection, owner: Int, name: String): Option[Project] =
-//  {
-//    getProjectByName(connection, name) match
-//    {
-//      case None =>
-//        prepareStatement(connection, "insert into "+qname("projects")+" (owner,name) values (?,?)",
-//          Left(owner), Left(name))
-//        { statement =>
-//          if (1 != statement.executeUpdate)
-//            sys.error("Cannot create project: no update.")
-//          getProjectByName(connection, name)
-//        }
-//      case Some(p) =>
-//        sys.error("Project '"+name+"' already exists.")
-//    }
-//  }
 //  def deleteProject(connection: Connection, projectId: Int) = txn(connection)
 //  {
 //    prepareStatement(connection, "delete from "+qname("project_skills")+" where project_id = ?", Left(projectId)) { _.executeUpdate() }
@@ -80,6 +106,9 @@ object ProjectMapping {
 //      "on p.id = np.pid",
 //    Left(userId), Left(userId)))
 //
+
+
+
 //  def getProjectByName(connection: Connection, name: String): Option[Project] =
 //  {
 //    prepareStatement(connection, "select id, name, owner, created from "+qname("projects")+" where name = ?",
@@ -96,15 +125,10 @@ object ProjectMapping {
 //      withUniqueRecord(statement.executeQuery, "Duplicate values for project id: "+id) (extractProject)
 //    }
 //  }
-//  def addProjectSkill(connection: Connection, projectId: Int, skillId: Int)
-//  {
-//    prepareStatement(connection, "insert into "+qname("project_skills")+" (project_id, skill_id) values (?, ?)",
-//      Left(projectId), Left(skillId))
-//    { statement =>
-//      if (1 != statement.executeUpdate)
-//        sys.error("Duplicate skill values for (projectId="+projectId+", skillId="+skillId+")")
-//    }
-//  }
+
+
+
+
 //  def addProjectMember(connection: Connection, projectId: Int, userId: Int)
 //  {
 //    prepareStatement(connection, "insert into "+qname("project_members")+" (project_id, user_id) values (?,?)",

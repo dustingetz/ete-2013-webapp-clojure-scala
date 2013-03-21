@@ -13,7 +13,7 @@ case class UserInfo(firstname: String, lastname: String, email: String, username
 
 case class Skill(name: String)
 
-case class Project(name: String, ownercreated: Long)
+case class Project(name: String, owner: String, created: java.util.Date)
 
 case class ProjectInfo(name: String, owner: User, created: Long, members: List[User], skills: List[Skill])
 

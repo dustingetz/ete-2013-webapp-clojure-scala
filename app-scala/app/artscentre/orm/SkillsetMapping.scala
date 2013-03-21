@@ -11,7 +11,7 @@ object SkillsetMapping {
 
       // delete all, then add back what we have.
 
-      val count = SQL("DELETE FROM skillsets WHERE user_id = {userId}").on('userId -> userId).executeUpdate()
+      val count = SQL("DELETE FROM skillsets WHERE user_id = {userId}").on('userId -> userId).executeUpdate()(dbconn)
       //assert count == 1
 
       val createSkill: String => Unit = SkillsetMapping.create(userId)

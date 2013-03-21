@@ -50,7 +50,7 @@ object PersistenceAPI {//extends API {
 //  {
 ////    val project = db.getProjectById(connection, projectId).getOrElse(sys.error("invalid project id: " + projectId))
 ////    if (project.ownerId != userId)
-////      sys.error("Cannot access project '"+project.name+"' ["+projectId+"]: user ["+userId+"] is not the owner ["+project.ownerId+"].")
+////      sys.error("Cannot access project '"+project.name+"' ["+projectId+"]: user ["+uaserId+"] is not the owner ["+project.ownerId+"].")
 //    ???
 //  }
 
