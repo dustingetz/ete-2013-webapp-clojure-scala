@@ -1,6 +1,7 @@
 package artscentre
 
-import artscentre.Skill
+import artscentre.models.Skill
+import artscentre.orm.SkillsMapping
 import play.api.Play
 import play.api.test.FakeApplication
 import java.util.UUID.randomUUID
@@ -42,7 +43,7 @@ object dataloader {
   def main(args: Array[String]) {
     Play.start(FakeApplication())
 
-    skills.foreach{ skillName => orm.SkillsMapping.create(randomUUID().toString, Skill(skillName)) }
+    skills.foreach{ skillName => SkillsMapping.create(randomUUID().toString, Skill(skillName)) }
 
     Play.stop()
   }

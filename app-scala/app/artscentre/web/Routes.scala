@@ -1,9 +1,5 @@
 package artscentre.web
 
-import artscentre.web._
-import scala._
-import artscentre.web.services.ArtsCentreServices
-
 
 //@Path("/")
 class APIWS
@@ -11,7 +7,7 @@ class APIWS
   /**
    * Here's the magic where we hook up the implementation, e.g. 'mock' or 'real'.
    */
-  private final val api = ArtsCentreServices.serviceDirectory.api
+  //private final val api = ArtsCentreServices.serviceDirectory.api
 
 //  /**
 //   * Lists all the skills available to be picked.

@@ -32,6 +32,6 @@ object Implicits {
   implicit val userFmt = Json.format[User]
   implicit val userInfoFmt = Json.format[UserInfo]
   implicit val projectFmt = Json.format[Project]
-  implicit val projectInfoFmt = Json.format[ProjectInfo]
+  //implicit val projectInfoFmt = Json.format[ProjectInfo]
   implicit val skillFmt = Json.format[Skill]
 }

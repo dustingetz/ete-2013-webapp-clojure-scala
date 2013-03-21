@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
-import orm.{SkillsetMapping, SkillsMapping}
+import artscentre.orm.{SkillsetMapping, SkillsMapping}
 import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB
@@ -74,10 +74,6 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     ???
   }
 
-  def updateUserSAkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>
-    ???
-  }
-
   def createProject = authorizedAction(parse.json, NormalUser) { user => implicit request =>
     ???
   }
@@ -98,7 +94,7 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     ???
   }
 
-  def listJoiendProjects = authorizedAction(NormalUser) { user => implicit request =>
+  def listJoindProjects = authorizedAction(NormalUser) { user => implicit request =>
     ???
   }
 

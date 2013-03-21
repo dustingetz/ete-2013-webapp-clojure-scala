@@ -1,8 +1,7 @@
-package orm
+package artscentre.orm
 
 import play.api.db.DB
 import anorm._
-import java.sql.Connection
 import artscentre.models.Skill
 
 

@@ -1,4 +1,4 @@
-package orm
+package artscentre.orm
 
 import anorm.SqlParser._
 import play.api.db.DB

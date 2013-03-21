@@ -1,6 +1,6 @@
 package artscentre
 
-import _root_.orm.SkillsMapping
+import artscentre.orm.SkillsMapping
 import artscentre.models._
 import artscentre.web.services.API
 
