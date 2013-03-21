@@ -56,7 +56,7 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
       val b: JsValue = request.body
       b.asOpt[List[String]].map {
 
-        DB.withConnection { implicit dbconn =>
+        DB.withTransaction { implicit dbconn =>
           SkillsetMapping.updateUserSkills(dbconn, user, _)
         }
 
@@ -76,7 +76,7 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     val projectName: String = "dustin's project"
     val skills: Seq[Int] = List(3, 19, 13)
 
-    DB.withConnection { implicit dbconn =>
+    DB.withTransaction { implicit dbconn =>
 
       // unnecessary, there is a database constraint
       if (ProjectMapping.getProjectByName(dbconn, projectName).isDefined) {
@@ -95,19 +95,19 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   }
 
   def projectAddMember = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+    DB.withTransaction { implicit dbconn =>
     }
     ???
   }
 
   def projectRemoveMember = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+    DB.withTransaction { implicit dbconn =>
     }
     ???
   }
 
   def deleteProject = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+    DB.withTransaction { implicit dbconn =>
     }
     ???
   }
