@@ -8,10 +8,12 @@ object ApplicationBuild extends Build {
   val appVersion      = "1.0-SNAPSHOT"
 
   val appDependencies = Seq(
-    "jp.t2v" %% "play2.auth" % "0.9",
-    "postgresql" % "postgresql" % "9.1-901.jdbc4",
-    jdbc,
-    anorm
+    "jp.t2v" %% "play2.auth" % "0.9"
+    ,"postgresql" % "postgresql" % "9.1-901.jdbc4"
+    ,jdbc
+    ,anorm
+    //,"joda-time" % "joda-time" % "2.1"
+    //,"org.joda" % "joda-convert" % "1.2"
   )
 
   playAssetsDirectories += file(baseDirectory + "../webapp")
