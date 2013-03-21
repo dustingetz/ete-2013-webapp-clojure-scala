@@ -4,8 +4,8 @@ POST    /login      controllers.LoginEndpoints.doLogin
 GET     /api/whoami                         controllers.ApiEndpoints.whoami
 GET     /api/list-skills-user-picker        controllers.ApiEndpoints.listSkillsUserPicker
 POST    /api/update-user-skills             controllers.ApiEndpoints.updateUserSkills
-GET     /api/list-all-skills                controllers.ApiEndpoints.listAllSkills
-GET     /api/list-user-skills               controllers.ApiEndpoints.listUserSkills
+#GET     /api/list-all-skills                controllers.ApiEndpoints.listAllSkills
+#GET     /api/list-user-skills               controllers.ApiEndpoints.listUserSkills
 POST    /api/create-project                 controllers.ApiEndpoints.createProject
 GET     /api/project-add-member             controllers.ApiEndpoints.projectAddMember
 GET     /api/project-remove-member          controllers.ApiEndpoints.projectRemoveMember
