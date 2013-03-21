@@ -27,7 +27,7 @@
     $ pg_ctl -D ~/var/postgresql status
 
     $ psql postgres
-    # create database artscentre;
-    # create user artscentre_owner with superuser login;
-    # alter user artscentre_owner password 'artscentre_owner123';
-    # \q
+    > create database artscentre;
+    > create user artscentre_owner with superuser login;
+    > alter user artscentre_owner password 'artscentre_owner123';
+    > \q
