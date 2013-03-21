@@ -5,6 +5,19 @@ GET     /api/whoami                         controllers.Api.whoami
 GET     /api/list-skills-user-picker        controllers.Api.listSkillsUserPicker
 POST    /api/update-user-skills             controllers.Api.updateUserSkills
 
+#GET     /api/list-all-skills
+#GET     /api/list-user-skills
+#POST    /api/create-project
+#GET     /api/project-add-member
+#GET     /api/project-remove-member
+#GET     /api/delete-project
+#GET     /api/list-owned-projects
+#GET     /api/list-joined-projects
+#GET     /api/list-eligible-projects
+
+
+
+
 GET     /test/hello       controllers.Test.hello
 GET     /test/sayHello    controllers.Test.sayHello
 
