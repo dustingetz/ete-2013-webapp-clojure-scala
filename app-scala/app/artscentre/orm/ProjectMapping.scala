@@ -2,7 +2,7 @@ package artscentre.orm
 
 import anorm.SqlParser._
 import anorm._
-import artscentre.models.{UserInfo, Project}
+import artscentre.models.{Project, ProjectInfo, User, Skill}
 
 
 object ProjectMapping {
@@ -25,6 +25,19 @@ object ProjectMapping {
     getProjectByName(dbconn, name)
   }
 
+  def deleteProject(dbconn: java.sql.Connection, id: String) {
+
+//    "DELETE FROM project_skills WHERE project_id = {projectId}"
+//    "DELETE FROM project_members WHERE project_id = {projectId}"
+//    "DELETE FROM projects WHERE id = {projectId}"
+
+    val count = SQL("DELETE FROM projects WHERE id = {projectId} CASCADE CONSTRAINTS")
+      .on('projectId -> id)
+      .executeUpdate()(dbconn)
+    // assert count == 1
+
+  }
+
 
   def getProjectByName(dbconn: java.sql.Connection, projectName: String): Option[Project] = {
 
@@ -33,6 +46,18 @@ object ProjectMapping {
         |SELECT id, name, owner, created FROM projects WHERE name = {projectName}
       """.stripMargin)
       .on('projectName -> projectName)
+      .as(directMapping *)(dbconn)
+
+    raw.view.map { t => Project(t._2, t._3, t._4) }.headOption
+  }
+
+  def read(dbconn: java.sql.Connection, id: String): Option[Project] = {
+
+    val raw: List[(String, String, String, java.util.Date)] = SQL(
+      """
+        |SELECT id, name, owner, created FROM projects WHERE id = {id}
+      """.stripMargin)
+      .on('id -> id)
       .as(directMapping *)(dbconn)
 
     raw.view.map { t => Project(t._2, t._3, t._4) }.headOption
@@ -49,85 +74,94 @@ object ProjectMapping {
   }
 
 
-  //  private def selectProjects(connection: Connection, by: String, params: Either[Any,Int]*) =
-//  {
-//    val sql = "select distinct p.id, p.name, p.owner, p.created from "+qname("projects")+" p"+(if (null == by || by.isEmpty) "" else (" "+by))+" order by name asc"
-//    Util.decorate(sql)
-//    {
-//      prepareStatement(connection, sql, params: _*)
-//      { statement =>
-//        getResults(statement.executeQuery) (extractProject)
-//      }
-//    }
-//  }
-//
-//  // create a project from the records set's fields according to the companion select.
-//  private def extractProject(rs: ResultSet): Project = new Project(rs getInt 1, rs getString 2, rs getInt 3, (rs getTimestamp 4).getTime)
+  /**
+   * unused?
+   */
+  def all(dbconn: java.sql.Connection): List[ProjectInfo] = {
+
+    val raw: List[(String, String, String, java.util.Date)] =
+      SQL("SELECT id, name, owner, created FROM projects")
+        .as(directMapping *)(dbconn)
+
+    val members: List[User] = ???
+    val skills: List[Skill] = ???
+    val owner: User = User(???)
+
+    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+
+  }
+
+  def forOwner(dbconn: java.sql.Connection, ownerId: String): List[ProjectInfo] = {
+
+    val raw: List[(String, String, String, java.util.Date)] =
+      SQL(
+        """
+          |SELECT id, name, owner, created
+          |FROM projects
+          |WHERE p.owner = {ownerId}
+        """.stripMargin)
+        .on('ownerId -> ownerId)
+        .as(directMapping *)(dbconn)
+
+    val members: List[User] = ???
+    val skills: List[Skill] = ???
+    val owner: User = User(???)
+
+    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+
+  }
+
+  def forMember(dbconn: java.sql.Connection, memberId: String): List[ProjectInfo] = {
+
+    val raw: List[(String, String, String, java.util.Date)] =
+      SQL(
+        """
+          |SELECT projects.id, projects.name, projects.owner, projects.created
+          |FROM projects
+          |INNER JOIN project_members ON projects.id = project_members.project_id
+          |INNER JOIN users ON project_members.user_id = users.id
+          |WHERE users.id = {memberId}
+        """.stripMargin)
+        .on('memberId -> memberId)
+        .as(directMapping *)(dbconn)
+
+    val members: List[User] = ???
+    val skills: List[Skill] = ???
+    val owner: User = User(???)
+
+    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+
+  }
 
 
+  /**
+   * projects on which you are not a member but have matching skill requirements.
+   */
+  def elligibleForUser(dbconn: java.sql.Connection, userId: String): List[ProjectInfo] = {
 
+    val raw: List[(String, String, String, java.util.Date)] =
+      SQL(
+        """
+          |SELECT projects.id, projects.name, projects.owner, projects.created
+          |FROM projects
+          |INNER JOIN project_skills ON projects.id = project_skills.project_id
+          |INNER JOIN
+          |    (SELECT projects.id AS pid FROM projects WHERE pid NOT IN
+          |        (SELECT p1.id FROM projects p1
+          |         INNER JOIN project_members m ON p1.id = m.project_id
+          |         INNER JOIN users u ON m.user_id = u.id WHERE u.id = {userId}))
+          |ON p.id = np.pid
+        """.stripMargin)
+        .on('userId -> userId)
+        .as(directMapping *)(dbconn)
 
+    val members: List[User] = ???
+    val skills: List[Skill] = ???
+    val owner: User = User(???)
 
+    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
 
-//  def deleteProject(connection: Connection, projectId: Int) = txn(connection)
-//  {
-//    prepareStatement(connection, "delete from "+qname("project_skills")+" where project_id = ?", Left(projectId)) { _.executeUpdate() }
-//    prepareStatement(connection, "delete from "+qname("project_members")+" where project_id = ?", Left(projectId)) { _.executeUpdate() }
-//    prepareStatement(connection, "delete from "+qname("projects")+" where id = ?", Left(projectId)) { _.executeUpdate() }
-//  }
-//  def listProjects(connection: Connection): List[Project] = selectProjects(connection, "")
-//  /**
-//   * Maps over a list of projects and uses the connection to fill in the rest of the project info.
-//   */
-//  private def toProjectInfo(connection: Connection, projects: List[Project]): List[ProjectInfo] = projects map
-//    { project =>
-//      new ProjectInfo(project.id, project.name,
-//        getUserById(connection, project.ownerId).getOrElse(sys.error("No project owner! ["+project.ownerId+"]")),
-//        project.created,
-//        listProjectMembers(connection, project.id),
-//        listProjectSkills(connection, project.id))
-//    }
-//  // projects you own
-//  def listProjectsByOwner(connection: Connection, ownerId: Int): List[ProjectInfo] = toProjectInfo(connection, selectProjects(connection,
-//    "where p.owner=?",
-//    Left(ownerId)))
-//  // projects on which you are participating
-//  def listProjectsByMember(connection: Connection, memberId: Int): List[ProjectInfo] = toProjectInfo(connection, selectProjects(connection,
-//    "inner join "+qname("project_members")+" m on p.id = m.project_id inner join "+qname("users")+" u on m.user_id = u.id where u.id=?",
-//    Left(memberId)))
-//  // projects on which you are not a member but have matching skill requirements.
-//  def listEligibleProjects(connection: Connection, userId: Int): List[ProjectInfo] = toProjectInfo(connection, selectProjects(connection,
-//    //		"left join "+qname("project_members")+" m on p.id = m.project_id and m.user_id = ? and user_id is null inner join "+qname("project_skills")+" ps on p.id = ps.project_id inner join "+qname("skillsets")+" s on s.user_id = ? and s.skill_id = ps.skill_id",
-//    "inner join "+qname("project_skills")+" ps on p.id = ps.project_id "+
-//      "inner join "+qname("skillsets")+" s on s.user_id = ? and s.skill_id = ps.skill_id "+
-//      "inner join "+
-//      "(select p.id as pid from "+qname("projects")+" p where p.id not in "+
-//      "(select p1.id from "+qname("projects")+" p1 inner join "+qname("project_members")+" m on p1.id = m.project_id inner join "+qname("users")+" u on m.user_id = u.id where u.id=?)) np "+
-//      "on p.id = np.pid",
-//    Left(userId), Left(userId)))
-//
-
-
-
-//  def getProjectByName(connection: Connection, name: String): Option[Project] =
-//  {
-//    prepareStatement(connection, "select id, name, owner, created from "+qname("projects")+" where name = ?",
-//      Left(name))
-//    { statement =>
-//      withUniqueRecord(statement.executeQuery, "Duplicate values for projectName: "+name) (extractProject)
-//    }
-//  }
-//  def getProjectById(connection: Connection, id: Int): Option[Project] =
-//  {
-//    prepareStatement(connection, "select id, name, owner, created from "+qname("projects")+" where id = ?",
-//      Left(id))
-//    { statement =>
-//      withUniqueRecord(statement.executeQuery, "Duplicate values for project id: "+id) (extractProject)
-//    }
-//  }
-
-
-
+  }
 
 //  def addProjectMember(connection: Connection, projectId: Int, userId: Int)
 //  {

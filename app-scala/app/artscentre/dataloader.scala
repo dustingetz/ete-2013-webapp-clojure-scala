@@ -5,6 +5,8 @@ import artscentre.orm.SkillsMapping
 import play.api.Play
 import play.api.test.FakeApplication
 import java.util.UUID.randomUUID
+import play.api.db.DB
+
 
 object dataloader {
 
@@ -41,9 +43,14 @@ object dataloader {
 
 
   def main(args: Array[String]) {
-    Play.start(FakeApplication())
+    implicit val app = FakeApplication()
+    Play.start(app)
 
-    skills.foreach{ skillName => SkillsMapping.create(randomUUID().toString, Skill(skillName)) }
+    DB.withTransaction { dbconn =>
+
+      skills.foreach{ skillName => SkillsMapping.create(dbconn, randomUUID().toString, Skill(skillName)) }
+
+    }
 
     Play.stop()
   }

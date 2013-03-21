@@ -26,12 +26,12 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
    * {"username":"binky","firstName":"binky","lastName":"rabbit"}
    */
   def whoami = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
 
-      val resp = UserInfoMapping.read(dbconn, user)
-      Ok(Json.toJson(resp))
-
+    val userInfo = DB.withConnection { implicit dbconn =>
+      UserInfoMapping.read(dbconn, user)
     }
+
+    Ok(Json.toJson(userInfo))
   }
 
 
@@ -44,18 +44,21 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   // this helps us keep dependencies on a request or database isolated, so as much of our code
   // as possible can run in contexts without these.
   def listSkillsUserPicker = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+
+    val (allSkills, userSkills) = DB.withConnection { implicit dbconn =>
 
       val allSkills: Map[String, Skill] = SkillsMapping.all(dbconn)
       val userSkills: Map[String, Skill] = SkillsMapping.forUser(dbconn, user)
 
-      val payload: Iterable[UserSkillPickerPayload] = allSkills.view.map { case (id, skill) =>
-        val enabled = userSkills.contains(id)
-        UserSkillPickerPayload(id, skill.name, enabled)
-      }
-
-      Ok(Json.toJson(payload))
+      (allSkills, userSkills)
     }
+
+    val payload: Iterable[UserSkillPickerPayload] = allSkills.view.map { case (id, skill) =>
+      val enabled = userSkills.contains(id)
+      UserSkillPickerPayload(id, skill.name, enabled)
+    }
+
+    Ok(Json.toJson(payload))
   }
 
 
@@ -80,9 +83,9 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     // owner: Int, name: String, skills: Seq[Int]
     // {"name":"dustin's project","skills":[3,19,13]}
 
-    val owner: String = user
-    val projectName: String = "dustin's project"
-    val skills: Seq[String] = List("1", "2", "3")
+    val owner: String = ???
+    val projectName: String = ???
+    val skills: Seq[String] = ???
 
     DB.withTransaction { implicit dbconn =>
 
@@ -108,28 +111,57 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     ???
   }
 
+  /**
+   * /api/delete-project?projectId=4
+   * must be project owner to delete it
+   */
   def deleteProject = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withTransaction { implicit dbconn =>
+
+    val projectId: Option[String] = request.getQueryString("projectId")
+
+    projectId.map { projectId =>
+      DB.withTransaction { implicit dbconn =>
+
+        val project: Option[Project] = ProjectMapping.read(dbconn, projectId)
+
+        // this error handling sucks
+        project.filter(_.owner == user).map { _ =>
+          ProjectMapping.deleteProject(dbconn, projectId)
+        }
+
+      }
+    } match {
+      case Some(_) => Ok
+      case None => BadRequest("malformed request params")
     }
-    ???
+
   }
 
   def listOwnedProjects = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+
+    val ownedProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+      ProjectMapping.forOwner(dbconn, user)
     }
-    ???
+
+    Ok(Json.toJson(ownedProjects))
   }
 
   def listJoinedProjects = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+
+    val joinedProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+      ProjectMapping.forMember(dbconn, user)
     }
-    ???
+
+    Ok(Json.toJson(joinedProjects))
   }
 
   def listElligibleProjects = authorizedAction(NormalUser) { user => implicit request =>
-    DB.withConnection { implicit dbconn =>
+
+    val elligibleProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+      ProjectMapping.elligibleForUser(dbconn, user)
     }
-    ???
+
+    Ok(Json.toJson(elligibleProjects))
   }
 
 

@@ -8,43 +8,6 @@ object PersistenceAPI {
   type Connection = java.sql.Connection
 
 
-  def createProject(owner: Int, name: String, skills: Seq[Int])
-  {
-//    log.debug("create project: "+owner+", "+name)
-//    db.connect
-//    { connection=> db.txn(connection)
-//      {
-//        if (db.getProjectByName(connection,name).isDefined)
-//          sys.error("Project '"+name+"' already exists.")
-//        db.createProject(connection, owner, name)
-//        val projectId = db.getProjectByName(connection, name).getOrElse(sys.error("Cannot find project named \""+name+"\".")).id
-//        skills.foreach(skillId => db.addProjectSkill(connection, projectId, skillId))
-//      }
-//    }
-    ???
-  }
-
-
-//  private def checkProjectOwner(connection: Connection, userId: Int, projectId: Int)
-//  {
-////    val project = db.getProjectById(connection, projectId).getOrElse(sys.error("invalid project id: " + projectId))
-////    if (project.ownerId != userId)
-////      sys.error("Cannot access project '"+project.name+"' ["+projectId+"]: user ["+uaserId+"] is not the owner ["+project.ownerId+"].")
-//    ???
-//  }
-
-
-  def deleteProject(userId: Int, projectId: Int)
-  {
-//    log.debug("project: delete: "+projectId)
-//    db.connect
-//    { connection =>
-//      checkProjectOwner(connection, userId, projectId)
-//      db.deleteProject(connection, projectId)
-//    }
-    ???
-  }
-
 
   def projectAddMember(projectId: Int, memberId: Int)
   {

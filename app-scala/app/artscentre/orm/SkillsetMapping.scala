@@ -1,8 +1,6 @@
 package artscentre.orm
 
-import play.api.db.DB
 import anorm._
-import artscentre.models.Skill
 
 
 object SkillsetMapping {
@@ -14,19 +12,17 @@ object SkillsetMapping {
       val count = SQL("DELETE FROM skillsets WHERE user_id = {userId}").on('userId -> userId).executeUpdate()(dbconn)
       //assert count == 1
 
-      val createSkill: String => Unit = SkillsetMapping.create(userId)
+      val createSkill: String => Unit = SkillsetMapping.create(dbconn, userId)
       skillIds.foreach(createSkill)
   }
 
 
 
-  def create(userId: String)(skillId: String) {
-    DB.withTransaction { implicit connection =>
-      val count = SQL("INSERT INTO skillsets (user_id, skill_id) VALUES ({user_id}, {skill_id})")
-        .on('user_id -> userId, 'skill_id -> skillId)
-        .executeUpdate()
-      // assert count==1
-    }
+  def create(dbconn: java.sql.Connection, userId: String)(skillId: String) {
+    val count = SQL("INSERT INTO skillsets (user_id, skill_id) VALUES ({user_id}, {skill_id})")
+      .on('user_id -> userId, 'skill_id -> skillId)
+      .executeUpdate()(dbconn)
+    // assert count==1
   }
 
 

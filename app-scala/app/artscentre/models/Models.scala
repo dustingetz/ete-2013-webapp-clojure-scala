@@ -11,7 +11,8 @@ package artscentre.models
  * can be case sensitive because in some cases we reuse the models as json payloads
  */
 
-case class User(username: String)
+case class User(username: String)   // is the userId part of the public model? is it used on the client?
+                                    // probably shouldnt be, as username has unique constraint
 
 case class UserInfo(firstName: String, lastName: String, email: String, username: String, created: java.util.Date)
 
@@ -19,7 +20,7 @@ case class Skill(name: String)
 
 case class Project(name: String, owner: String, created: java.util.Date)
 
-case class ProjectInfo(name: String, owner: User, created: Long, members: List[User], skills: List[Skill])
+case class ProjectInfo(name: String, owner: User, created: java.util.Date, members: List[User], skills: List[Skill])
 
 
 
