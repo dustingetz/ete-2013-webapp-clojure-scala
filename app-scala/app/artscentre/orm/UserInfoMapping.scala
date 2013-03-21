@@ -39,8 +39,8 @@ object UserInfoMapping {
       .on('id -> id,
       'username -> obj.username,
       'email -> obj.email,
-      'firstname -> obj.firstname,
-      'lastname -> obj.lastname,
+      'firstname -> obj.firstName,
+      'lastname -> obj.lastName,
       'created -> obj.created)
       .executeUpdate()
       // assert count==1
@@ -56,7 +56,7 @@ object UserInfoMapping {
         WHERE users.id = {id}
       """)
       .on('id -> id)
-      .as(directMapping *)
+      .as(directMapping *)(dbconn)
     raw.view.map { t => UserInfo(t._2, t._3, t._4, t._5, t._6) }.headOption
 
   }
@@ -72,8 +72,8 @@ object UserInfoMapping {
       .on('id -> id,
       'username -> obj.username,
       'email -> obj.email,
-      'firstname -> obj.firstname,
-      'lastname -> obj.lastname,
+      'firstname -> obj.firstName,
+      'lastname -> obj.lastName,
       'created -> obj.created)
       .executeUpdate()
       // assert count == 1

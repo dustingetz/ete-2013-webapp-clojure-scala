@@ -14,10 +14,10 @@ object ProjectMapping {
     get[java.util.Date]("projects.created") map(flatten)
 
 
-  def createProject(dbconn: java.sql.Connection, owner: String, name: String): Option[Project] = {
+  def createProject(dbconn: java.sql.Connection, id: String, owner: String, name: String): Option[Project] = {
 
     val count = SQL("insert into projects (id, owner, name) values ({id}, {owner}, {name})")
-      .on('owner -> owner, 'name -> name)
+      .on('id -> id, 'owner -> owner, 'name -> name)
       .executeUpdate()(dbconn)
     // assert count == 1
 
@@ -39,7 +39,7 @@ object ProjectMapping {
   }
 
 
-  def addProjectSkill(dbconn: java.sql.Connection, projectId: Int, skillId: Int) {
+  def addProjectSkill(dbconn: java.sql.Connection, projectId: String, skillId: String) {
 
     val count = SQL("insert into project_skills (project_id, skill_id) values ({projectId}, {skillId})")
       .on('projectId -> projectId, 'skillId -> skillId)

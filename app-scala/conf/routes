@@ -11,7 +11,7 @@ GET     /api/project-add-member             controllers.ApiEndpoints.projectAddM
 GET     /api/project-remove-member          controllers.ApiEndpoints.projectRemoveMember
 GET     /api/delete-project                 controllers.ApiEndpoints.deleteProject
 GET     /api/list-owned-projects            controllers.ApiEndpoints.listOwnedProjects
-GET     /api/list-joined-projects           controllers.ApiEndpoints.listJoindProjects
+GET     /api/list-joined-projects           controllers.ApiEndpoints.listJoinedProjects
 GET     /api/list-eligible-projects         controllers.ApiEndpoints.listElligibleProjects
 
 

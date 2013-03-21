@@ -1,26 +1,11 @@
 package artscentre
 
-import artscentre.orm.SkillsMapping
 import artscentre.models._
-import artscentre.web.services.API
 
 
-object PersistenceAPI {//extends API {
+object PersistenceAPI {
 
   type Connection = java.sql.Connection
-
-  def listAllSkills(dbconn: Connection): Iterable[Skill] = {
-    val allSkills: Map[String, Skill] = SkillsMapping.all(dbconn)
-    allSkills.values
-  }
-
-  def listUserSkills(userId: Int): List[Skill] = {
-    ???
-  }
-
-  def updateUserSkills(userId: Int, skillIds: Seq[Int]) {
-    ???
-  }
 
 
   def createProject(owner: Int, name: String, skills: Seq[Int])

@@ -9,6 +9,7 @@ import artscentre.orm._
 import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB
+import java.util.UUID.randomUUID
 
 
 object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
@@ -61,10 +62,10 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   def updateUserSkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>
 
       val b: JsValue = request.body
-      b.asOpt[List[String]].map {
+      b.asOpt[List[String]].map { skillIds =>
 
         DB.withTransaction { implicit dbconn =>
-          SkillsetMapping.updateUserSkills(dbconn, user, _)
+          SkillsetMapping.updateUserSkills(dbconn, user, skillIds)
         }
 
       } match {
@@ -81,18 +82,12 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
 
     val owner: String = user
     val projectName: String = "dustin's project"
-    val skills: Seq[Int] = List(3, 19, 13)
+    val skills: Seq[String] = List("1", "2", "3")
 
     DB.withTransaction { implicit dbconn =>
 
-      // unnecessary, there is a database constraint
-      if (ProjectMapping.getProjectByName(dbconn, projectName).isDefined) {
-        return BadRequest("project %s already exists".format(projectName))
-      }
-
-      ProjectMapping.createProject(dbconn, owner, projectName)
-
-      val projectId = ProjectMapping.getProjectByName(dbconn, projectName).getOrElse(sys.error("Cannot find project named \""+projectName+"\".")).id
+      val projectId = randomUUID().toString
+      ProjectMapping.createProject(dbconn, projectId, owner, projectName)
 
       skills.foreach(skillId => ProjectMapping.addProjectSkill(dbconn, projectId, skillId))
 
@@ -125,7 +120,7 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     ???
   }
 
-  def listJoindProjects = authorizedAction(NormalUser) { user => implicit request =>
+  def listJoinedProjects = authorizedAction(NormalUser) { user => implicit request =>
     DB.withConnection { implicit dbconn =>
     }
     ???
