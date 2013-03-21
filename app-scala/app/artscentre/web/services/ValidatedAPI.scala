@@ -1,5 +1,7 @@
 package artscentre.web.services
 
+import artscentre.models._
+
 
 /**
  * Provides a validation layer on the API intended to be stacked with an implementation (a mock or a database).
@@ -11,7 +13,9 @@ class APIValidated(api: API)
 {
 
   def login(username: String, password: String): Option[UserInfo] = api.login(username,password)
+
   def whoami(userId: Int): Option[UserInfo] = api.whoami(userId)
+
   def register(firstName: String, lastName: String, email: String, username: String, password: String): Option[JSONObject] =
   {
     val errors = new JSONObject()

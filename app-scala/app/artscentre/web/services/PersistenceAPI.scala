@@ -1,16 +1,15 @@
 package artscentre.web.services
 
+import artscentre.web.{ProjectInfo,Project,Skill}
+import artscentre.models._
+import java.sql.Connection
+
 
 /**
  * Persistence API build on DB.
  */
 class APIDB extends API
 {
-  import artscentre.web.ArtsCentreWeb.db
-  import artscentre.web.{ProjectInfo,Project,Skill}
-  import java.sql.Connection
-
-  private val log = Log(this.getClass)
   private def logException [T](m: => String)(f: => T):T =
   {
     try f
@@ -21,6 +20,8 @@ class APIDB extends API
           throw e
       }
   }
+
+
   override def login(username: String, password: String): Option[UserInfo] =
   {
     logException("login failed: "+username)
@@ -29,6 +30,8 @@ class APIDB extends API
       db.connect { db.loginUser(_, username, password) }
     }
   }
+
+
   /**
    * Returns a JSON object indicating problems with the fields.
    */
@@ -40,6 +43,8 @@ class APIDB extends API
       db.connect { db.createUser(_, firstName, lastName, email, username, password); }
     }
   }
+
+
   override def whoami(userId: Int): Option[UserInfo] =
   {
     logException("whoami failed")
@@ -48,6 +53,8 @@ class APIDB extends API
       db.connect { db.getUserInfo(_, userId) }
     }
   }
+
+
   override def listAllSkills(): List[Skill] =
   {
     logException("list skills failed.")
@@ -56,6 +63,8 @@ class APIDB extends API
       db.connect { db.getSkills(_) }
     }
   }
+
+
   override def listUserSkills(userId: Int): List[Skill] =
   {
     logException("list skills failed.")
@@ -64,6 +73,8 @@ class APIDB extends API
       db.connect { db.getUserSkills(_, userId) }
     }
   }
+
+
   override def updateUserSkills(userId: Int, skillIds: Seq[Int])
   {
     logException("update user skills failed.")
@@ -72,6 +83,8 @@ class APIDB extends API
       db.connect { db.updateUserSkills(_, userId, skillIds) }
     }
   }
+
+
   override def createProject(owner: Int, name: String, skills: Seq[Int])
   {
     logException("create project failed.")
@@ -89,12 +102,16 @@ class APIDB extends API
       }
     }
   }
+
+
   private def checkProjectOwner(connection: Connection, userId: Int, projectId: Int)
   {
     val project = db.getProjectById(connection, projectId).getOrElse(sys.error("invalid project id: " + projectId))
     if (project.ownerId != userId)
       sys.error("Cannot access project '"+project.name+"' ["+projectId+"]: user ["+userId+"] is not the owner ["+project.ownerId+"].")
   }
+
+
   override def deleteProject(userId: Int, projectId: Int)
   {
     logException("project delete failed.")
@@ -107,6 +124,8 @@ class APIDB extends API
       }
     }
   }
+
+
   override def projectAddMember(projectId: Int, memberId: Int)
   {
     logException("project add-member failed.")
@@ -118,6 +137,8 @@ class APIDB extends API
       }
     }
   }
+
+
   override def projectRemoveMember(projectId: Int, memberId: Int)
   {
     logException("project remove-member failed.")
@@ -129,6 +150,8 @@ class APIDB extends API
       }
     }
   }
+
+
   override def listProjects(): List[Project] =
   {
     logException("list projects")
@@ -137,6 +160,8 @@ class APIDB extends API
       db.connect(db.listProjects(_))
     }
   }
+
+
   override def listProjectsByOwner(ownerId: Int): List[ProjectInfo] =
   {
     logException("list projects by owner")
@@ -145,6 +170,8 @@ class APIDB extends API
       db.connect(db.listProjectsByOwner(_, ownerId))
     }
   }
+
+
   override def listProjectsByMember(memberId: Int): List[ProjectInfo] =
   {
     logException("list projects by member")
@@ -153,6 +180,8 @@ class APIDB extends API
       db.connect(db.listProjectsByMember(_, memberId))
     }
   }
+
+
   override def listEligibleProjects(userId: Int): List[ProjectInfo] =
   {
     logException("list eligible projects: "+userId)

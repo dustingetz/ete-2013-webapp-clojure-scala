@@ -6,12 +6,12 @@ import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
 import orm.{SkillsetMapping, SkillsMapping}
-import models.Skill
+import artscentre.{Implicits, Skill}
 
 
-object Api extends Controller with Auth with ServiceAuthConfig {
+object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
 
-  import models.Implicits._
+  import Implicits._
 
   def whoami = authorizedAction(NormalUser) { user => implicit request =>
     val resp = Map(
@@ -42,5 +42,48 @@ object Api extends Controller with Auth with ServiceAuthConfig {
     val b: JsValue = request.body
     b.asOpt[List[String]].map { SkillsetMapping.updateUserSkills(user, _) }.map { _ => Ok } getOrElse (BadRequest)
   }
+
+
+  def listAllSkills = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def listUserSkills = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def updateUserSAkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def createProject = authorizedAction(parse.json, NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def projectAddMember = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def projectRemoveMember = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def deleteProject = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def listOwnedProjects = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def listJoiendProjects = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+  def listElligibleProjects = authorizedAction(NormalUser) { user => implicit request =>
+    ???
+  }
+
+
 
 }

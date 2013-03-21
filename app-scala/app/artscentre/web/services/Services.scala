@@ -1,18 +1,7 @@
 package artscentre.web.services
 
-package artscentre.web.services
-
-import com.sun.jersey.api.core.PackagesResourceConfig
-import artscentre.loggers.log4j.Log
 import scala.language.implicitConversions
-import com.sun.jersey.api.core.PackagesResourceConfig
-import javax.ws.rs.core.Response
-import javax.ws.rs.WebApplicationException
-import javax.ws.rs.core.Response.Status
-import javax.ws.rs.core.MediaType
-import org.codehaus.jettison.json.JSONArray
-import org.codehaus.jettison.json.JSONObject
-import artscentre.loggers.log4j.Log
+
 
 /**
  * The application's web services are provided their implementations via an instance of this.
@@ -43,12 +32,8 @@ class ArtsCentreServices extends PackagesResourceConfig (classOf [ArtsCentreServ
 
 object WSError
 {
-  import javax.ws.rs.core.{Response,MediaType}
-  import javax.ws.rs.core.Response.Status
-
   private def barf(status: Response.Status, mime: String, entity: Any): Nothing =
   {
-    import javax.ws.rs.WebApplicationException
     throw new WebApplicationException(Response.status(status).entity(entity).`type`(mime.toString).build())
   }
   def unauthorized(message: String) = barf(Status.UNAUTHORIZED, MediaType.TEXT_PLAIN, message)
@@ -60,13 +45,6 @@ object WSError
  */
 object WSUtil
 {
-  import javax.ws.rs.WebApplicationException
-  import javax.ws.rs.core.Response
-  import javax.ws.rs.core.Response.Status
-  import org.codehaus.jettison.json.{JSONArray, JSONObject}
-  import javax.ws.rs.core.MediaType
-
-  private val log = Log (getClass)
   private val mimeTypes = new javax.activation.MimetypesFileTypeMap
   def mimeType (fileName : String) = mimeTypes getContentType fileName
   /**
@@ -86,7 +64,7 @@ object WSUtil
       {
         case e: WebApplicationException => throw e // pass it on; Jersey can handle it.
         case e: Throwable =>
-          log.error (e) ("AJAX: " + e.getMessage)
+          /log.error (e) ("AJAX: " + e.getMessage)
           Response.status(Status.INTERNAL_SERVER_ERROR).entity(e.getMessage).`type`(MediaType.TEXT_PLAIN).build
       }
   }

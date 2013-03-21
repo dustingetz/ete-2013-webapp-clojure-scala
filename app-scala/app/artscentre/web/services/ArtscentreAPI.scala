@@ -1,5 +1,7 @@
 package artscentre.web.services
 
+import artscentre.models._
+
 /**
  * API for persistence that can be mocked.
  */

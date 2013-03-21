@@ -1,4 +1,4 @@
-package artscentre.web
+package artscentre.legacy
 
 /**
  * Some simple and general utilities.

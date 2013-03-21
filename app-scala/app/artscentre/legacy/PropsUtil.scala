@@ -1,12 +1,13 @@
-package artscentre.util
+package artscentre.legacy
+
+import java.io.{File,InputStream,FileInputStream}
+import java.util.Properties
 
 /**
  * Utilities for loading properties files.
  */
 object PropsUtil
 {
-  import java.io.{File,InputStream,FileInputStream}
-  import java.util.Properties
 
   /**
    * Read properties from a stream.
@@ -21,6 +22,8 @@ object PropsUtil
     props load istream
     createFromProps (props)
   }
+
+
   /**
    * Read properties from a resource path.
    * @param resourcePath
@@ -35,6 +38,8 @@ object PropsUtil
     try fromStream (s) (createFromProps)
     finally s.close
   }
+
+
   /**
    * Read properties from a file.
    * @param propsFile The properties file.

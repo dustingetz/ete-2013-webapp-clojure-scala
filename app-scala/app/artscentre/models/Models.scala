@@ -1,5 +1,4 @@
-package models
-
+package artscentre.models
 
 /**
  * Models don't have IDs - that is a database implementation detail.

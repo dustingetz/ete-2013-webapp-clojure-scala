@@ -2,7 +2,7 @@ package artscentre.web
 
 import com.mchange.v2.c3p0.ComboPooledDataSource
 import artscentre.loggers.log4j.Log
-import artscentre.web.Util
+import artscentre.legacy.Util
 
 /**
  * Just a username and id.
@@ -133,9 +133,9 @@ object ADB
 {
   import artscentre.loggers.log4j.Log
   import java.util.Properties
-  import artscentre.util.PropsUtil
   import java.io.{InputStream, File}
   import java.sql.ResultSet
+  import artscentre.legacy.PropsUtil
 
   private final val log = Log(ADB)
   /**

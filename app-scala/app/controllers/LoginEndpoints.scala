@@ -8,7 +8,7 @@ import jp.t2v.lab.play2.auth.LoginLogout
 import controllers.auth.PageAuthConfig
 
 
-object Authentication extends Controller with LoginLogout with PageAuthConfig {
+object LoginEndpoints extends Controller with LoginLogout with PageAuthConfig {
 
   private def authenticate(username: String, password: String): Boolean = true
 

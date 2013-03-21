@@ -1,7 +1,6 @@
 package artscentre.web.services
 
 import artscentre.web._
-import artscentre.web.services.{WSError, WSUtil, ArtsCentreServices}
 import artscentre.web.ArtsCentreWeb._
 import scala._
 

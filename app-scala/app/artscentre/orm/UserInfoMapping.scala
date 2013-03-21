@@ -3,7 +3,7 @@ package orm
 import anorm.SqlParser._
 import play.api.db.DB
 import anorm._
-import models.UserInfo
+import artscentre.UserInfo
 
 
 object UserInfoMapping {

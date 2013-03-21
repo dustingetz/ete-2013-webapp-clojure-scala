@@ -1,9 +1,9 @@
 package orm
 
 import anorm.SqlParser._
-import models.Skill
 import play.api.db.DB
 import anorm._
+import artscentre.Skill
 
 
 object SkillsMapping {

@@ -1,4 +1,6 @@
-import models.Skill
+package artscentre
+
+import artscentre.Skill
 import play.api.Play
 import play.api.test.FakeApplication
 import java.util.UUID.randomUUID
