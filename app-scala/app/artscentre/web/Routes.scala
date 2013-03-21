@@ -1,8 +1,8 @@
-package artscentre.web.services
+package artscentre.web
 
 import artscentre.web._
-import artscentre.web.ArtsCentreWeb._
 import scala._
+import artscentre.web.services.ArtsCentreServices
 
 
 //@Path("/")

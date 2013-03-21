@@ -9,7 +9,7 @@ import artscentre.loggers.log4j.Log
  */
 object TestDB
 {
-  import artscentre.web.ADB
+  import artscentre.web.database.ADB
 
   def main(args: Array[String])
   {
@@ -64,9 +64,9 @@ object TestDB
 case class UserDef(firstName: String, lastName: String, email: String, username: String, password: String)
 class TestDB extends FunSuite
 {
-  import artscentre.web.ADB
   import artscentre.loggers.log4j.Log
   import TestDB._
+  import artscentre.web.database.ADB
 
   val pattern = "%d{yyyy-MMM-dd/HH:mm:ss,SSS} %c%n%p: %m%n"
   Log.init(Log.INFO, pattern)

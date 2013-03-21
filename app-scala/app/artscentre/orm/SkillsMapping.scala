@@ -3,12 +3,12 @@ package orm
 import anorm.SqlParser._
 import play.api.db.DB
 import anorm._
-import artscentre.Skill
+import artscentre.models.Skill
 
 
 object SkillsMapping {
 
-  import play.api.Play.current
+
 
   type ID = String
 
@@ -16,11 +16,9 @@ object SkillsMapping {
     get[ID]("skills.id") ~
     get[String]("skills.name") map(flatten)
 
-  def all(): Map[ID, Skill] = {
-    DB.withConnection { implicit connection =>
-      val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)
-      raw.view.map { t => t._1 -> Skill(t._2) }.toMap
-    }
+  def all(dbconn: java.sql.Connection): Map[ID, Skill] = {
+    val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)
+    raw.view.map { t => t._1 -> Skill(t._2) }.toMap
   }
 
   def create(id: ID, obj: Skill) {
@@ -61,17 +59,15 @@ object SkillsMapping {
     }
   }
 
-  def forUser(userId: ID): Map[ID, Skill] = {
-    DB.withConnection { implicit connection =>
-      val raw: List[(ID, String)] = SQL(
-        """
-          |SELECT skills.id, skills.name FROM skills
-          |INNER JOIN skillsets
-          |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
-        """.stripMargin)
-        .on('userId -> userId)
-        .as(directMapping *)
-      raw.view.map { t => t._1 -> Skill(t._2) }.toMap
-    }
+  def forUser(dbconn: java.sql.Connection, userId: ID): Map[ID, Skill] = {
+    val raw: List[(ID, String)] = SQL(
+      """
+        |SELECT skills.id, skills.name FROM skills
+        |INNER JOIN skillsets
+        |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
+      """.stripMargin)
+      .on('userId -> userId)
+      .as(directMapping *)
+    raw.view.map { t => t._1 -> Skill(t._2) }.toMap
   }
 }

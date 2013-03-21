@@ -1,4 +1,4 @@
-import artscentre.web.ADB
+import artscentre.web.database.ADB
 import javax.servlet.ServletContextEvent
 import play.api._
 

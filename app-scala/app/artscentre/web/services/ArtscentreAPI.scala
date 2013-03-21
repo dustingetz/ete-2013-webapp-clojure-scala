@@ -6,8 +6,11 @@ import artscentre.models._
  * API for persistence that can be mocked.
  */
 trait API {
-  def login(username: String, password: String): Option[UserInfo]
-  def register(firstName: String, lastName: String, email: String, username: String, password: String)
+
+  // login and register are no longer part of the artscentre api - they are external concerns.
+  //def login(username: String, password: String): Option[UserInfo]
+  //def register(firstName: String, lastName: String, email: String, username: String, password: String)
+
   def whoami(userId: Int): Option[UserInfo]
   def listAllSkills(): List[Skill]
   def listUserSkills(userId: Int): List[Skill]
