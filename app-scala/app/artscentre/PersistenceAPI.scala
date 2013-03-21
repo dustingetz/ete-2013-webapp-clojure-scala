@@ -7,13 +7,7 @@ import artscentre.web.services.API
 
 object PersistenceAPI {//extends API {
 
-  //implicit val dbconn: java.sql.Connection
   type Connection = java.sql.Connection
-
-  def whoami(userId: Int): Option[UserInfo] = {
-    val user: UserInfo = ???  // fn of ID
-    Some(user)
-  }
 
   def listAllSkills(dbconn: Connection): Iterable[Skill] = {
     val allSkills: Map[String, Skill] = SkillsMapping.all(dbconn)

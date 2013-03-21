@@ -47,18 +47,18 @@ object UserInfoMapping {
     }
   }
 
-  def read(id: ID): Option[UserInfo] = {
-    DB.withConnection { implicit connection =>
-      val raw: List[(ID, String, String, String, String, java.util.Date)] = SQL(
-        """
-          SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
-          FROM users
-          WHERE users.id = {id}
-        """)
-        .on('id -> id)
-        .as(directMapping *)
-      raw.view.map { t => UserInfo(t._2, t._3, t._4, t._5, t._6) }.headOption
-    }
+  def read(dbconn: java.sql.Connection, id: ID): Option[UserInfo] = {
+
+    val raw: List[(ID, String, String, String, String, java.util.Date)] = SQL(
+      """
+        SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
+        FROM users
+        WHERE users.id = {id}
+      """)
+      .on('id -> id)
+      .as(directMapping *)
+    raw.view.map { t => UserInfo(t._2, t._3, t._4, t._5, t._6) }.headOption
+
   }
 
   def update(id: ID, obj: UserInfo) {

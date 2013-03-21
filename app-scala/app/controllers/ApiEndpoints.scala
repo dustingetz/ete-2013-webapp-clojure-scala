@@ -5,7 +5,7 @@ import play.api.mvc._
 import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
-import artscentre.orm.{ProjectMapping, SkillsetMapping, SkillsMapping}
+import artscentre.orm._
 import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB
@@ -21,15 +21,22 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   import play.api.Play.current
 
 
-
+  /**
+   * {"username":"binky","firstName":"binky","lastName":"rabbit"}
+   */
   def whoami = authorizedAction(NormalUser) { user => implicit request =>
-    val resp = ???
-    Ok(Json.toJson(resp))
+    DB.withConnection { implicit dbconn =>
+
+      val resp = UserInfoMapping.read(dbconn, user)
+      Ok(Json.toJson(resp))
+
+    }
   }
 
 
   private case class UserSkillPickerPayload(id: String, name: String, enabled: Boolean)
   private implicit val skillPayloadFmt = Json.format[UserSkillPickerPayload]
+
 
   // express with type system: what resources is this endpoint allowed to use?
   // user, request, database.

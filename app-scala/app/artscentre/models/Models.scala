@@ -7,9 +7,13 @@ package artscentre.models
  * "primary key" for a moment for why this makes tons of sense)
  */
 
+/**
+ * can be case sensitive because in some cases we reuse the models as json payloads
+ */
+
 case class User(username: String)
 
-case class UserInfo(firstname: String, lastname: String, email: String, username: String, created: java.util.Date)
+case class UserInfo(firstName: String, lastName: String, email: String, username: String, created: java.util.Date)
 
 case class Skill(name: String)
 
