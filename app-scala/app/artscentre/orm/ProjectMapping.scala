@@ -114,7 +114,7 @@ object ProjectMapping {
         |WHERE m.project_id = {projectId}
       """.stripMargin)
       .on('projectId -> projectId)
-      .as(mapUser *)
+      .as(mapUser *)(dbconn)
       .view.toSet
 
   }
@@ -135,7 +135,7 @@ object ProjectMapping {
         |WHERE p.id = {projectId}
       """.stripMargin)
       .on('projectId -> projectId)
-      .as(mapSkill *)
+      .as(mapSkill *)(dbconn)
       .view.toSet
 
   }

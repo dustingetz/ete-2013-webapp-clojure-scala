@@ -50,15 +50,15 @@ object Implicits {
       (json \ "name").as[String],
       (json \ "owner").as[User],
       (json \ "created").as[Option[java.util.Date]].get,
-      (json \ "members").as[List[User]],
-      (json \ "skills").as[List[Skill]]))
+      (json \ "members").as[Set[User]],
+      (json \ "skills").as[Set[Skill]]))
 
     def writes(u: ProjectInfo): JsValue = JsObject(List(
       "name" -> JsString(u.name),
       "owner" -> JsString(u.owner.username),
       "created" -> Json.toJson(u.created),
-      "members" -> JsArray(u.members.map(Json.toJson(_))),
-      "skills" -> JsArray(u.skills.map(Json.toJson(_)))))
+      "members" -> JsArray(u.members.map(Json.toJson(_)).toSeq),
+      "skills" -> JsArray(u.skills.map(Json.toJson(_)).toSeq)))
   }
 
 

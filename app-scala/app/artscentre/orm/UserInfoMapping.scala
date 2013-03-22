@@ -39,7 +39,7 @@ object UserInfoMapping {
       """
         SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
         FROM users
-      """).as(mapModelWithId *).toMap
+      """).as(mapModelWithId *)(dbconn).toMap
 
   }
 
@@ -53,7 +53,7 @@ object UserInfoMapping {
           'firstname -> obj.firstName,
           'lastname -> obj.lastName,
           'created -> obj.created)
-      .executeUpdate()
+      .executeUpdate()(dbconn)
 
     verify(count == 1, "insert expected 1 row, got: %s".format(count))
   }
@@ -87,18 +87,18 @@ object UserInfoMapping {
           'firstname -> obj.firstName,
           'lastname -> obj.lastName,
           'created -> obj.created)
-      .executeUpdate()
+      .executeUpdate()(dbconn)
 
     verify(count == 1, "update expected 1 row, got: %s".format(count))
 
   }
 
 
-  def delete(id: String): Try[Unit] = Try {
+  def delete(dbconn: java.sql.Connection, id: String): Try[Unit] = Try {
 
     val count = SQL("DELETE FROM users WHERE id = {id}")
       .on('id -> id)
-      .executeUpdate()
+      .executeUpdate()(dbconn)
 
     verify(count == 1, "delete expected 1 row, got: %s".format(count))
 

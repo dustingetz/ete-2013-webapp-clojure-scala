@@ -10,6 +10,7 @@ import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB
 import java.util.UUID.randomUUID
+import scala.util.{Success, Try, Failure}
 
 
 object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
@@ -27,11 +28,15 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
    */
   def whoami = authorizedAction(NormalUser) { user => implicit request =>
 
-    val userInfo = DB.withConnection { implicit dbconn =>
+    val userInfo: Try[Option[UserInfo]] = DB.withConnection { implicit dbconn =>
       UserInfoMapping.read(dbconn, user)
     }
 
-    Ok(Json.toJson(userInfo))
+    userInfo match {
+      case Failure(err) => InternalServerError(err.toString)
+      case Success(Some(obj)) => Ok(Json.toJson(obj))
+      case Success(None) => InternalServerError("couldn't read userinfo for user `%s`".format(user))
+    }
   }
 
 
@@ -122,12 +127,12 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
     projectId.map { projectId =>
       DB.withTransaction { implicit dbconn =>
 
-        val project: Option[Project] = ProjectMapping.read(dbconn, projectId)
+        val project: Try[Option[Project]] = ProjectMapping.read(dbconn, projectId)
 
         // this error handling sucks
-        project.filter(_.owner == user).map { _ =>
+        project.map(_.filter(_.owner == user).map { _ =>
           ProjectMapping.deleteProject(dbconn, projectId)
-        }
+        })
 
       }
     } match {
@@ -139,29 +144,39 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
 
   def listOwnedProjects = authorizedAction(NormalUser) { user => implicit request =>
 
-    val ownedProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+    val ownedProjects: Try[Map[String, ProjectInfo]] = DB.withConnection { implicit dbconn =>
       ProjectMapping.forOwner(dbconn, user)
     }
 
-    Ok(Json.toJson(ownedProjects))
+    ownedProjects match {
+      case Failure(err) => InternalServerError(err.toString)
+      case Success(obj) => Ok(Json.toJson(obj))
+    }
+
   }
 
   def listJoinedProjects = authorizedAction(NormalUser) { user => implicit request =>
 
-    val joinedProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+    val joinedProjects: Try[Map[String, ProjectInfo]] = DB.withConnection { implicit dbconn =>
       ProjectMapping.forMember(dbconn, user)
     }
 
-    Ok(Json.toJson(joinedProjects))
+    joinedProjects match {
+      case Failure(err) => InternalServerError(err.toString)
+      case Success(obj) => Ok(Json.toJson(obj))
+    }
   }
 
   def listElligibleProjects = authorizedAction(NormalUser) { user => implicit request =>
 
-    val elligibleProjects: List[ProjectInfo] = DB.withConnection { implicit dbconn =>
+    val elligibleProjects: Try[Map[String, ProjectInfo]] = DB.withConnection { implicit dbconn =>
       ProjectMapping.elligibleForUser(dbconn, user)
     }
 
-    Ok(Json.toJson(elligibleProjects))
+    elligibleProjects match {
+      case Failure(err) => InternalServerError(err.toString)
+      case Success(obj) => Ok(Json.toJson(obj))
+    }
   }
 
 
