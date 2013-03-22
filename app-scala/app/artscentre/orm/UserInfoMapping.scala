@@ -1,68 +1,80 @@
 package artscentre.orm
 
 import anorm.SqlParser._
-import play.api.db.DB
 import anorm._
-import artscentre.models.{User, UserInfo}
-import java.sql.{Connection, ResultSet}
+import artscentre.models.UserInfo
+import scala.util.Try
+import util.debug.verify
 
 
 object UserInfoMapping {
 
-  import play.api.Play.current
-
-  private val directMapping =
-    get[ID]("users.id") ~
+  private val mapModel =
     get[String]("users.username") ~
     get[String]("users.email") ~
     get[String]("users.firstname") ~
     get[String]("users.lastname") ~
-    get[java.util.Date]("users.created") map(flatten)
-
-
-  type ID = String
-
-  def list(): Map[ID, UserInfo] = {
-    DB.withConnection { implicit connection =>
-      val raw: List[(ID, String, String, String, String, java.util.Date)] = SQL(
-        """
-          SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
-          FROM users
-        """).as(directMapping *)
-      raw.view.map { t => t._1 -> UserInfo(t._2, t._3, t._4, t._5, t._6) }.toMap
+    get[java.util.Date]("users.created") map {
+      case username~email~firstname~lastname~created =>
+        UserInfo(username, email, firstname, lastname, created)
     }
+
+  private val mapModelWithId =
+    get[String]("users.id") ~
+    get[String]("users.username") ~
+    get[String]("users.email") ~
+    get[String]("users.firstname") ~
+    get[String]("users.lastname") ~
+    get[java.util.Date]("users.created") map {
+      case id~username~email~firstname~lastname~created =>
+        id -> UserInfo(username, email, firstname, lastname, created)
+    }
+
+
+
+
+  def list(dbconn: java.sql.Connection): Try[Map[String, UserInfo]] = Try {
+
+    SQL(
+      """
+        SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
+        FROM users
+      """).as(mapModelWithId *).toMap
+
   }
 
-  def create(id: ID, obj: UserInfo) {
-    DB.withTransaction { implicit connection =>
+
+  def create(dbconn: java.sql.Connection, id: String, obj: UserInfo): Try[Unit] = Try {
+
     val count = SQL("INSERT INTO users VALUES ({id}, {username}, {email}, {firstname}, {lastname}, {created})")
       .on('id -> id,
-      'username -> obj.username,
-      'email -> obj.email,
-      'firstname -> obj.firstName,
-      'lastname -> obj.lastName,
-      'created -> obj.created)
+          'username -> obj.username,
+          'email -> obj.email,
+          'firstname -> obj.firstName,
+          'lastname -> obj.lastName,
+          'created -> obj.created)
       .executeUpdate()
-      // assert count==1
-    }
+
+    verify(count == 1, "insert expected 1 row, got: %s".format(count))
   }
 
-  def read(dbconn: java.sql.Connection, id: ID): Option[UserInfo] = {
 
-    val raw: List[(ID, String, String, String, String, java.util.Date)] = SQL(
+  def read(dbconn: java.sql.Connection, id: String): Try[Option[UserInfo]] = Try {
+
+    SQL(
       """
         SELECT users.id, users.username, users.email, users.firstname, users.lastname, users.created
         FROM users
         WHERE users.id = {id}
       """)
       .on('id -> id)
-      .as(directMapping *)(dbconn)
-    raw.view.map { t => UserInfo(t._2, t._3, t._4, t._5, t._6) }.headOption
+      .as(mapModel *)(dbconn).headOption
 
   }
 
-  def update(id: ID, obj: UserInfo) {
-    DB.withTransaction { implicit connection =>
+
+  def update(dbconn: java.sql.Connection, id: String, obj: UserInfo): Try[Unit] = Try {
+
     val count = SQL(
       """
         UPDATE users
@@ -70,23 +82,26 @@ object UserInfoMapping {
         WHERE id = {id}
       """)
       .on('id -> id,
-      'username -> obj.username,
-      'email -> obj.email,
-      'firstname -> obj.firstName,
-      'lastname -> obj.lastName,
-      'created -> obj.created)
+          'username -> obj.username,
+          'email -> obj.email,
+          'firstname -> obj.firstName,
+          'lastname -> obj.lastName,
+          'created -> obj.created)
       .executeUpdate()
-      // assert count == 1
-    }
+
+    verify(count == 1, "update expected 1 row, got: %s".format(count))
+
   }
 
-  def delete(id: ID) {
-    DB.withTransaction { implicit connection =>
+
+  def delete(id: String): Try[Unit] = Try {
+
     val count = SQL("DELETE FROM users WHERE id = {id}")
       .on('id -> id)
       .executeUpdate()
-      //assert count == 1
-    }
+
+    verify(count == 1, "delete expected 1 row, got: %s".format(count))
+
   }
 
 

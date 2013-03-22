@@ -3,29 +3,55 @@ package artscentre.orm
 import anorm.SqlParser._
 import anorm._
 import artscentre.models.{Project, ProjectInfo, User, Skill}
+import util.debug._
+import anorm.~
+import artscentre.models.User
+import artscentre.models.Project
+import artscentre.models.Skill
+import artscentre.models.ProjectInfo
+import scala.util.Try
 
 
 object ProjectMapping {
 
-  private val directMapping =
+  private val mapRawTuple =
     get[String]("projects.id") ~
     get[String]("projects.owner") ~
     get[String]("projects.name") ~
     get[java.util.Date]("projects.created") map(flatten)
 
+  private val mapModel =
+    get[String]("projects.owner") ~
+    get[String]("projects.name") ~
+    get[java.util.Date]("projects.created") map {
+      case owner~name~created =>
+        Project(name, owner, created)
+    }
 
-  def createProject(dbconn: java.sql.Connection, id: String, owner: String, name: String): Option[Project] = {
+  private val mapProjectWithId =
+    get[String]("projects.id") ~
+    get[String]("projects.owner") ~
+    get[String]("projects.name") ~
+    get[java.util.Date]("projects.created") map {
+      case id~owner~name~created =>
+        id -> Project(name, owner, created)
+    }
+
+
+  def createProject(dbconn: java.sql.Connection, id: String, owner: String, name: String): Try[Project] = Try {
 
     val count = SQL("insert into projects (id, owner, name) values ({id}, {owner}, {name})")
       .on('id -> id, 'owner -> owner, 'name -> name)
       .executeUpdate()(dbconn)
-    // assert count == 1
+
+    verify(count == 1, "insert expected 1 row, got: %s".format(count))
 
     // have to read back because created time is set in database
-    getProjectByName(dbconn, name)
+    val p: Try[Option[Project]] = getProjectByName(dbconn, name)
+    p.get.get
   }
 
-  def deleteProject(dbconn: java.sql.Connection, id: String) {
+  def deleteProject(dbconn: java.sql.Connection, id: String): Try[Unit] = Try {
 
 //    "DELETE FROM project_skills WHERE project_id = {projectId}"
 //    "DELETE FROM project_members WHERE project_id = {projectId}"
@@ -34,102 +60,150 @@ object ProjectMapping {
     val count = SQL("DELETE FROM projects WHERE id = {projectId} CASCADE CONSTRAINTS")
       .on('projectId -> id)
       .executeUpdate()(dbconn)
-    // assert count == 1
+
+    verify(count == 1, "delete expected 1 row, got: %s".format(count))
 
   }
 
 
-  def getProjectByName(dbconn: java.sql.Connection, projectName: String): Option[Project] = {
+  def getProjectByName(dbconn: java.sql.Connection, projectName: String): Try[Option[Project]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] = SQL(
+    SQL(
       """
         |SELECT id, name, owner, created FROM projects WHERE name = {projectName}
       """.stripMargin)
       .on('projectName -> projectName)
-      .as(directMapping *)(dbconn)
+      .as(mapModel *)(dbconn).headOption
 
-    raw.view.map { t => Project(t._2, t._3, t._4) }.headOption
   }
 
-  def read(dbconn: java.sql.Connection, id: String): Option[Project] = {
+  def read(dbconn: java.sql.Connection, id: String): Try[Option[Project]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] = SQL(
+    SQL(
       """
         |SELECT id, name, owner, created FROM projects WHERE id = {id}
       """.stripMargin)
       .on('id -> id)
-      .as(directMapping *)(dbconn)
+      .as(mapModel *)(dbconn).headOption
 
-    raw.view.map { t => Project(t._2, t._3, t._4) }.headOption
   }
 
 
-  def addProjectSkill(dbconn: java.sql.Connection, projectId: String, skillId: String) {
+  def addProjectSkill(dbconn: java.sql.Connection, projectId: String, skillId: String): Try[Unit] = Try {
 
     val count = SQL("insert into project_skills (project_id, skill_id) values ({projectId}, {skillId})")
       .on('projectId -> projectId, 'skillId -> skillId)
       .executeUpdate()(dbconn)
-    // assert count == 1
+
+    verify(count == 1, "insert expected 1 row, got: %s".format(count))
+
+  }
+
+  private def queryMembers(dbconn: java.sql.Connection, projectId: String): Try[Set[User]] = Try {
+
+    val mapUser =
+      get[String]("u.id") ~
+      get[String]("u.username") map {
+        case id~username => User(username)
+      }
+
+    SQL(
+      """
+        |SELECT u.id, u.username FROM users u
+        |INNER JOIN project_members m ON u.id = m.user_id
+        |WHERE m.project_id = {projectId}
+      """.stripMargin)
+      .on('projectId -> projectId)
+      .as(mapUser *)
+      .view.toSet
+
+  }
+
+  def querySkills(dbconn: java.sql.Connection, projectId: String): Try[Set[Skill]] = Try {
+
+    val mapSkill =
+      get[String]("s.id") ~
+      get[String]("s.name") map {
+        case id~name => Skill(name)
+      }
+
+    SQL(
+      """
+        |SELECT s.id, s.name FROM skills s
+        |INNER JOIN project_skills k ON s.id = k.skill_id
+        |INNER JOIN projects p ON p.id = k.project_id
+        |WHERE p.id = {projectId}
+      """.stripMargin)
+      .on('projectId -> projectId)
+      .as(mapSkill *)
+      .view.toSet
 
   }
 
 
   /**
-   * unused?
+   * note that this generates up to 2N+1 queries
    */
-  def all(dbconn: java.sql.Connection): List[ProjectInfo] = {
+  def all(dbconn: java.sql.Connection): Try[Map[String, ProjectInfo]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] =
+    val projects: Map[String, Project] =
       SQL("SELECT id, name, owner, created FROM projects")
-        .as(directMapping *)(dbconn)
+        .as(mapProjectWithId *)(dbconn).toMap
 
-    val members: List[User] = ???
-    val skills: List[Skill] = ???
-    val owner: User = User(???)
+    projects.map { case (projectId, project) =>
 
-    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+      val owner = User(project.owner)
+      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
+      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+
+      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
+    }.toMap
 
   }
 
-  def forOwner(dbconn: java.sql.Connection, ownerId: String): List[ProjectInfo] = {
+  def forOwner(dbconn: java.sql.Connection, ownerId: String): Try[Map[String, ProjectInfo]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] =
-      SQL(
-        """
-          |SELECT id, name, owner, created
-          |FROM projects
-          |WHERE p.owner = {ownerId}
-        """.stripMargin)
+    val projects: Map[String, Project] = SQL(
+      """
+        |SELECT id, name, owner, created
+        |FROM projects
+        |WHERE p.owner = {ownerId}
+      """.stripMargin)
         .on('ownerId -> ownerId)
-        .as(directMapping *)(dbconn)
+        .as(mapProjectWithId *)(dbconn).toMap
 
-    val members: List[User] = ???
-    val skills: List[Skill] = ???
-    val owner: User = User(???)
+    projects.map { case (projectId, project) =>
 
-    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+      val owner = User(project.owner)
+      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
+      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+
+      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
+    }.toMap
 
   }
 
-  def forMember(dbconn: java.sql.Connection, memberId: String): List[ProjectInfo] = {
+  def forMember(dbconn: java.sql.Connection, memberId: String): Try[Map[String, ProjectInfo]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] =
-      SQL(
-        """
-          |SELECT projects.id, projects.name, projects.owner, projects.created
-          |FROM projects
-          |INNER JOIN project_members ON projects.id = project_members.project_id
-          |INNER JOIN users ON project_members.user_id = users.id
-          |WHERE users.id = {memberId}
-        """.stripMargin)
-        .on('memberId -> memberId)
-        .as(directMapping *)(dbconn)
+    val projects: Map[String, Project] = SQL(
+      """
+        |SELECT projects.id, projects.name, projects.owner, projects.created
+        |FROM projects
+        |INNER JOIN project_members ON projects.id = project_members.project_id
+        |INNER JOIN users ON project_members.user_id = users.id
+        |WHERE users.id = {memberId}
+      """.stripMargin)
+      .on('memberId -> memberId)
+      .as(mapProjectWithId *)(dbconn).toMap
 
-    val members: List[User] = ???
-    val skills: List[Skill] = ???
-    val owner: User = User(???)
+    projects.map { case (projectId, project) =>
 
-    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+      val owner = User(project.owner)
+      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
+      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+
+      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
+    }.toMap
 
   }
 
@@ -137,29 +211,31 @@ object ProjectMapping {
   /**
    * projects on which you are not a member but have matching skill requirements.
    */
-  def elligibleForUser(dbconn: java.sql.Connection, userId: String): List[ProjectInfo] = {
+  def elligibleForUser(dbconn: java.sql.Connection, userId: String): Try[Map[String, ProjectInfo]] = Try {
 
-    val raw: List[(String, String, String, java.util.Date)] =
-      SQL(
-        """
-          |SELECT projects.id, projects.name, projects.owner, projects.created
-          |FROM projects
-          |INNER JOIN project_skills ON projects.id = project_skills.project_id
-          |INNER JOIN
-          |    (SELECT projects.id AS pid FROM projects WHERE pid NOT IN
-          |        (SELECT p1.id FROM projects p1
-          |         INNER JOIN project_members m ON p1.id = m.project_id
-          |         INNER JOIN users u ON m.user_id = u.id WHERE u.id = {userId}))
-          |ON p.id = np.pid
-        """.stripMargin)
-        .on('userId -> userId)
-        .as(directMapping *)(dbconn)
+    val projects: Map[String, Project] = SQL(
+      """
+        |SELECT projects.id, projects.name, projects.owner, projects.created
+        |FROM projects
+        |INNER JOIN project_skills ON projects.id = project_skills.project_id
+        |INNER JOIN
+        |    (SELECT projects.id AS pid FROM projects WHERE pid NOT IN
+        |        (SELECT p1.id FROM projects p1
+        |         INNER JOIN project_members m ON p1.id = m.project_id
+        |         INNER JOIN users u ON m.user_id = u.id WHERE u.id = {userId}))
+        |ON p.id = np.pid
+      """.stripMargin)
+      .on('userId -> userId)
+      .as(mapProjectWithId *)(dbconn).toMap
 
-    val members: List[User] = ???
-    val skills: List[Skill] = ???
-    val owner: User = User(???)
+    projects.map { case (projectId, project) =>
 
-    raw.view.map { t => ProjectInfo(t._2, owner, t._4, members, skills) }.toList
+      val owner = User(project.owner)
+      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
+      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+
+      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
+    }.toMap
 
   }
 
@@ -188,22 +264,6 @@ object ProjectMapping {
 //    { statement =>
 //      if (1 != statement.executeUpdate)
 //        sys.error("Wrong delete from project, project_id = "+projectId+", skill_id = "+skillId)
-//    }
-//  }
-//  def listProjectMembers(connection: Connection, projectId: Int): List[User] =
-//  {
-//    prepareStatement(connection, "select u.id, u.username from "+qname("users")+" u inner join "+qname("project_members")+" m on u.id = m.user_id where m.project_id = ?",
-//      Left(projectId))
-//    { statement =>
-//      getResults(statement.executeQuery) (extractUser)
-//    }
-//  }
-//  def listProjectSkills(connection: Connection, projectId: Int): List[Skill] =
-//  {
-//    prepareStatement(connection, "select s.id, s.name from "+qname("skills")+" s inner join "+qname("project_skills")+" k on s.id=k.skill_id inner join "+qname("projects")+" p on p.id = k.project_id where p.id=? order by name asc",
-//      Left(projectId))
-//    { statement =>
-//      getResults(statement.executeQuery) { rs => new Skill(rs getInt 1, rs getString 2) }
 //    }
 //  }
 }

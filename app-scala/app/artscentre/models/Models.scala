@@ -22,7 +22,7 @@ case class Skill(name: String)
 
 case class Project(name: String, owner: String, created: java.util.Date)
 
-case class ProjectInfo(name: String, owner: User, created: java.util.Date, members: List[User], skills: List[Skill])
+case class ProjectInfo(name: String, owner: User, created: java.util.Date, members: Set[User], skills: Set[Skill])
 
 
 
