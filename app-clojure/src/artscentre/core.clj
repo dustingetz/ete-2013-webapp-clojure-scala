@@ -1,4 +1,4 @@
-(ns app-clojure.core)
+(ns artscentre.core)
 
 (defn foo
   "I don't do a whole lot."
