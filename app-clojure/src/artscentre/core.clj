@@ -15,8 +15,11 @@
                   (d/create-database uri)
                   (d/connect uri)))
 
-  (let [schema-tx (concat schema/ShortUri
-                          schema/User)]
+  (let [schema-tx (concat schema/User
+                          schema/UserInfo
+                          schema/Skill
+                          schema/Project
+                          schema/ProjectInfo)]
     @(d/transact @appdb/conn schema-tx))
 
   ;; (let [fixtures-tx (read-string (slurp "install/fixtures.dtm"))]

@@ -1,45 +1,23 @@
-(ns artscentre.schema)
+(ns artscentre.schema
+  (:use [datomico.core :only [build-schema]]))
 
-(def ShortUri [{:db/ident        :shorturi/alias
-                :db/valueType    :db.type/string
-                :db/cardinality  :db.cardinality/one
-                :db/unique       :db.unique/identity
-                :db/id #db/id[:db.part/db]
-                :db.install/_attribute :db.part/db}
 
-               {:db/ident        :shorturi/uri
-                :db/valueType    :db.type/string
-                :db/cardinality  :db.cardinality/one
-                :db/id #db/id[:db.part/db]
-                :db.install/_attribute :db.part/db}
+(def User (build-schema :User [[:username :string :unique]]))
 
-               {:db/ident        :shorturi/owner
-                :db/valueType    :db.type/ref
-                :db/cardinality  :db.cardinality/one
-                :db/id #db/id [:db.part/db]
-                :db.install/_attribute :db.part/db}])
+(def UserInfo (build-schema :UserInfo [[:username   :string :unique]
+                                       [:firstName  :string]
+                                       [:lastName   :string]
+                                       [:email      :string :unique]
+                                       [:created    :instant]]))
 
-(def User [{:db/ident        :user/email
-            :db/valueType    :db.type/string
-            :db/cardinality  :db.cardinality/one
-            :db/unique       :db.unique/identity
-            :db/id #db/id[:db.part/db]
-            :db.install/_attribute :db.part/db}
+(def Skill (build-schema :Skill [[:name :string :unique]]))
 
-           {:db/ident        :user/name
-            :db/valueType    :db.type/string
-            :db/cardinality  :db.cardinality/one
-            :db/id #db/id[:db.part/db]
-            :db.install/_attribute :db.part/db}
+(def Project (build-schema :Project [[:name     :string]
+                                     [:owner    :ref]
+                                     [:created  :instant]]))
 
-           {:db/ident        :user/following
-            :db/valueType    :db.type/ref
-            :db/cardinality  :db.cardinality/many
-            :db/id #db/id[:db.part/db]
-            :db.install/_attribute :db.part/db}
-
-           {:db/ident        :user/favorites
-            :db/valueType    :db.type/ref
-            :db/cardinality  :db.cardinality/many
-            :db/id #db/id[:db.part/db]
-            :db.install/_attribute :db.part/db}])
+(def ProjectInfo (build-schema :ProjectInfo [[:name     :string :unique]
+                                             [:owner    :ref]
+                                             [:created  :instant]
+                                             [:members  :ref :many]
+                                             [:skills   :ref :many]]))
