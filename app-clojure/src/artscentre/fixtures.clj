@@ -14,6 +14,45 @@
 
 (assert @conn "no db connection")
 
+;; default list of skills
+
+(def skillList ["Web Designer",
+                "Objective C Developer",
+                "Android Developer",
+                "Classical Guitar",
+                "Jazz Guitar",
+                "Classical Piano",
+                "Jazz Piano",
+                "Composer",
+                "Conductor",
+                "Photographer",
+                "Graphic Designer",
+                "Oboe",
+                "Clarinet",
+                "Trumpet",
+                "Horn",
+                "English Horn",
+                "Viola",
+                "Violin",
+                "Cello",
+                "Bass",
+                "Video Editor",
+                "Painter",
+                "Sculptor",
+                "Dancer",
+                "Choreographer",
+                "Producer",
+                "Lighting Designer",
+                "Director"])
+
+(def skills [{:Skill/name
+              }])
+
+
+
+
+
+
 ;; some users join
 
 (def users [{:user/email "dustin.getz@foo.com"  :user/name "Dustin Getz"}
