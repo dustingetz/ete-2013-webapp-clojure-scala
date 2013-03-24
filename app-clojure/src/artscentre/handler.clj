@@ -1,14 +1,17 @@
 (ns artscentre.handler
-  (:use [compojure.core])
+  (:use [compojure.core]
+        [ring.middleware.json])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [ring.middleware.stacktrace :as stacktrace]
+            [ring.util.response :as r]
             ;;[ring.middleware.reload :as reload]
+            [artscentre.api :as api]
             [artscentre.views :as views]))
 
 
 (defroutes app-routes
-  (GET   "/api/whoami"                   [] (views/index))
+  (GET   "/api/whoami"                   [] (r/response (api/whoami)))
   (GET   "/api/list-skills-user-picker"  [] (views/index))
   (GET   "/api/update-user-skills"       [] (views/index))
   (GET   "/api/project-add-member"       [] (views/index))
@@ -26,6 +29,8 @@
   (route/files "/" {:root "../webapp"})
   (route/not-found "Not Found"))
 
-(def ring-app (-> app-routes
+(def ring-app (-> (handler/api app-routes)
                   stacktrace/wrap-stacktrace
-                  handler/site))
+                  wrap-json-body
+                  wrap-json-response
+                  wrap-json-params))

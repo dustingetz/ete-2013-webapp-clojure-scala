@@ -7,4 +7,6 @@
                  [ring "1.1.8"]
                  [compojure "1.1.5"]
                  [com.datomic/datomic "0.8.3848"]
-                 [datomico "0.1.0"]])
+                 [datomico "0.1.0"]
+                 [cheshire "5.0.2"]
+                 [ring/ring-json "0.2.0"]])

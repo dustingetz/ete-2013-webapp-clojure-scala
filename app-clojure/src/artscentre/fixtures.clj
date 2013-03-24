@@ -11,9 +11,6 @@
 ;;(map #(d/entity dbval (first %)) *1)
 ;;(map #(d/touch %) *1)
 
-
-(assert @conn "no db connection")
-
 ;; default list of skills
 
 (def skillList ["Web Designer",
@@ -46,24 +43,31 @@
                 "Director"])
 
 (def skills (map (fn [x] {:Skill/name x}) skillList))
-@(d/transact @conn (data-with-dbid skills))
 
-
-;; some users join
 (def users [{:User/username "dustin" }
             {:User/username "jason" }])
-@(d/transact @conn (data-with-dbid users))
 
 
 
-;; we can query for them
-(def dbval (db @conn))
-(q '[:find ?e
-     :in $ ?username
-     :where [?e :User/username ?username]]
-   dbval
-   (:User/username (users 0)))
 
+
+(defn load-fixtures []
+  (assert @conn "no db connection")
+
+  @(d/transact @conn (data-with-dbid skills))
+
+  @(d/transact @conn (data-with-dbid users))
+
+  ;; we can query for them now
+  (def dbval (db @conn))
+  (q '[:find ?e
+       :in $ ?username
+       :where [?e :User/username ?username]]
+     dbval
+     (:User/username (users 0)))
+
+
+  )
 
 
 
