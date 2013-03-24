@@ -8,15 +8,24 @@
 
 
 (defroutes app-routes
-  (GET   "/"       []                (views/index))
-  (POST  "/form"   {form :params}    (do (prn form) (views/formSubmit form)))
-  (GET   "/form"   []                (views/form))
-  (GET   "/:key"   [key]             (views/redirect key))
+  (GET   "/api/whoami"                   [] (views/index))
+  (GET   "/api/list-skills-user-picker"  [] (views/index))
+  (GET   "/api/update-user-skills"       [] (views/index))
+  (GET   "/api/project-add-member"       [] (views/index))
+  (GET   "/api/project-remove-member"    [] (views/index))
+  (GET   "/api/delete-project"           [] (views/index))
+  (GET   "/api/list-owned-projects"      [] (views/index))
+  (GET   "/api/list-joined-projects"     [] (views/index))
+  (GET   "/api/list-eligible-projects"   [] (views/index))
 
-  (route/resources "/")
+
+  (GET   "/login"   [] (views/form))
+  (POST  "/login"   {form :params}    (do (prn form) (views/formSubmit form)))
+;;  (GET   "/:key"   [key] (views/redirect key))
+
+  (route/files "/" {:root "../webapp"})
   (route/not-found "Not Found"))
 
 (def ring-app (-> app-routes
-                  ;;#(reload/wrap-reload % ['tinyurl-datomic.handler])
                   stacktrace/wrap-stacktrace
                   handler/site))
