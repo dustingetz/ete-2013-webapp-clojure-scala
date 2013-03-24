@@ -45,31 +45,27 @@
                 "Lighting Designer",
                 "Director"])
 
-(def skills [{:Skill/name
-              }])
-
-
-
-
+(def skills (map (fn [x] {:Skill/name x}) skillList))
+@(d/transact @conn (data-with-dbid skills))
 
 
 ;; some users join
-
-(def users [{:user/email "dustin.getz@foo.com"  :user/name "Dustin Getz"}
-            {:user/email "alice.atkins@foo.com" :user/name "Alice Atkins"}
-            {:user/email "bob.billard@foo.com"  :user/name "Bob Billard"}
-            {:user/email "cathy.catkin@foo.com" :user/name "Cathy Catkin"}])
-
+(def users [{:User/username "dustin" }
+            {:User/username "jason" }])
 @(d/transact @conn (data-with-dbid users))
+
+
 
 ;; we can query for them
 (def dbval (db @conn))
-(q '[:find ?e :in $ ?email :where [?e :user/email ?email]]
+(q '[:find ?e
+     :in $ ?username
+     :where [?e :User/username ?username]]
    dbval
-   (:user/email (users 0)))
+   (:User/username (users 0)))
 
 
-;; dustin adds an alias, bob adds an alias, then dustin follows bob
+
 
 ;; first get name/eid pairs
 (defn eid-by-email [dbval]
