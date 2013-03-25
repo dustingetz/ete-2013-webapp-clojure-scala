@@ -3,7 +3,8 @@
   (:require [ring.adapter.jetty :as jetty]
             [artscentre.handler :as handler]
             [artscentre.db :as appdb]
-            [artscentre.schema :as schema]))
+            [artscentre.schema :as schema]
+            [artscentre.fixtures :as fixtures]))
 
 
 (defn -main [& m]
@@ -22,11 +23,10 @@
                           schema/ProjectInfo)]
     @(d/transact @appdb/conn schema-tx))
 
-  ;; (let [fixtures-tx (read-string (slurp "install/fixtures.dtm"))]
-  ;;   @(d/transact @appdb/conn fixtures-tx))
   )
 
 ;; (-main)
 ;; (start-dev-db)
+;; (fixtures/load-fixtures @appdb/conn)
 ;; (.stop server)
 ;; (.start server)
