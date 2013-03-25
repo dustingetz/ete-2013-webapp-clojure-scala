@@ -58,8 +58,22 @@
 
   @(d/transact @conn (data-with-dbid users))
 
-  ;; we can query for them now
+
   (def dbval (db @conn))
+
+  ;; list all skills
+
+  ;;(mapv #(d/entity dbval (first %)) r)
+
+  (->> (q '[:find ?e
+            :where [?e :Skill/name]]
+          dbval)
+       #(d/entity %)
+       #(d/touch %))
+
+
+  ;; we can query for them now
+
   (q '[:find ?e
        :in $ ?username
        :where [?e :User/username ?username]]
@@ -125,26 +139,3 @@
 
 (d/entity dbval (ffirst *1))
 (d/touch *1)
-
-
-
-
-
-
-
-(let [newUser ]
-  @(d/transact @conn [newUser]))
-
-
-
-
-
-
-
-{:shorturi/alias "google"
- :shorturi/uri "http://www.google.com/"
- :db/id #db/id[:db.part/user -1000001]}
-
-{:shorturi/alias "dustingetz"
- :shorturi/uri "http://www.dustingetz.com/"
- :db/id #db/id[:db.part/user -1000002]}
