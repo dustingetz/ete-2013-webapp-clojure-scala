@@ -28,9 +28,11 @@ then
 	fi
 	exit 1
 fi
+cat ./env.sh
 source ./env.sh
-[ -n "$tomcat" ] || fail "Required environment variable tomcat not found."
 [ -n "$pgdb" ] || fail "Required environment variable pgdb not found."
+[ -d "$pg_bin" ] || fail "Cannot find pgsql bin directory: $pg_bin."
+export PATH="$PATH:$pg_bin"
 
 # warns when the file or directory you're trying to destroy doesn't exist.
 killOrNatter ()
@@ -43,14 +45,6 @@ killOrNatter ()
 	else
 		warn "Target not found: $target"
 	fi
-}
-# completely unpersons a web app from tomcat.
-undeploy ()
-{
-	target="$1" ; shift
-	killOrNatter "$tomcat/webapps/$target.war"
-	killOrNatter "$tomcat/webapps/$target"
-	killOrNatter "$tomcat/work/Catalina/localhost/$target"
 }
 
 if [ -z "$1" ]
@@ -86,6 +80,9 @@ do
 		;;
 	"status" )
 		pg_ctl -D "$pgdb/db/" status
+		;;
+	"i" )
+		psql postgres
 		;;
 	* )
 		fail "Unkown command: $action"
