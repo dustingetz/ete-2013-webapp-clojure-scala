@@ -2,7 +2,8 @@
   (:use [datomico.core :only [build-schema]]))
 
 
-(def User (build-schema :User [[:username :string :unique]]))
+(def User (build-schema :User [[:username  :string :unique]
+                               [:skills    :ref :many]]))
 
 (def UserInfo (build-schema :UserInfo [[:username   :string :unique]
                                        [:firstName  :string]
@@ -10,7 +11,7 @@
                                        [:email      :string :unique]
                                        [:created    :instant]]))
 
-(def Skill (build-schema :Skill [[:name :string :unique]]))
+(def Skill (build-schema :Skill [[:skillname :string :unique]]))
 
 (def Project (build-schema :Project [[:name     :string]
                                      [:owner    :ref]

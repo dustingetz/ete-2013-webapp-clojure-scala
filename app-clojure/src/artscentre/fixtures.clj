@@ -1,135 +1,46 @@
 (ns artscentre.fixtures
-    (:use [datomic.api :only [db q] :as d]))
+    (:use [datomic.api :only [db q] :as d]
+          [artscentre.datomic-util]
+          [artscentre.orm.skill :as skill]))
 
-
-(defn data-with-dbid
-  [data]
-  (map #(merge {:db/id (d/tempid :db.part/user)} %1) data))
 
 ;;(defn dump-eid [eids] null)
 ;;(map #(d/entity dbval (first %)) *1)
 ;;(map #(d/touch %) *1)
 
-;; default list of skills
-
-(def skillList ["Web Designer",
-                "Objective C Developer",
-                "Android Developer",
-                "Classical Guitar",
-                "Jazz Guitar",
-                "Classical Piano",
-                "Jazz Piano",
-                "Composer",
-                "Conductor",
-                "Photographer",
-                "Graphic Designer",
-                "Oboe",
-                "Clarinet",
-                "Trumpet",
-                "Horn",
-                "English Horn",
-                "Viola",
-                "Violin",
-                "Cello",
-                "Bass",
-                "Video Editor",
-                "Painter",
-                "Sculptor",
-                "Dancer",
-                "Choreographer",
-                "Producer",
-                "Lighting Designer",
-                "Director"])
-
-(def skills (map (fn [x] {:Skill/name x}) skillList))
-
-(def users [{:User/username "dustin" }
-            {:User/username "jason" }])
+(def skillList ["Web Designer"
+                "Objective C"
+                "Android"
+                "Scala"
+                "Clojure"
+                "Datomic"
+                "Java"
+                "Groovy"
+                "Haskell"])
 
 
+(defn load-fixtures [dbconn]
 
-(defn qes [query dbval & args]
-  (->> (apply d/q query dbval args)
-       (mapv first)
-       (mapv (partial d/entity dbval))))
+  ;; (def dbconn @artscentre.db/conn)
+  ;; (def dbval (db dbconn))
 
-(defn read-skills [dbval]
-  (->> (qes '[:find ?e :where [?e :Skill/name]] dbval)
-       (mapv d/touch)))
+  (def skills (map (fn [x] {:Skill/skillname x}) skillList))
 
-(defn read-user [dbval username]
-  (->> (qes '[:find ?e :in $ ?username
-              :where [?e :User/username ?username]]
-            dbval username)
-       (mapv d/touch)))
+  (def txresult (upsert dbconn (data-with-dbid skills)))
 
+  (def dbval (:db-before txresult))
+  (def dbval (:db-after  txresult))
 
-(defn load-fixtures [conn]
-  @(d/transact conn (data-with-dbid skills))
-  @(d/transact conn (data-with-dbid users))
+  (def users
+    (let [clojure (skill/read-by-name dbval "Clojure")
+          scala   (skill/read-by-name dbval "Scala")
+          datomic (skill/read-by-name dbval "Datomic")
+          java    (skill/read-by-name dbval "Java")
+          haskell (skill/read-by-name dbval "Haskell")
+          groovy  (skill/read-by-name dbval "Groovy")]
+      [{:User/username "dustin" :User/skills [clojure scala datomic java]}
+       {:User/username "jason"  :User/skills [scala haskell java groovy]}]))
 
-  )
-
-
-
-
-
-(defn unused []
-
-  ;; first get name/eid pairs
-  (defn eid-by-email [dbval]
-    (let [results (q '[:find ?n ?e :where [?e :user/email ?n]] dbval)]
-      (into {} results)))
-
-  ((eid-by-email dbval) "dustin.getz@foo.com")
-
-  ;; add some aliases
-  (let [users (eid-by-email dbval)
-        a1 {:shorturi/alias "dustingetz"
-            :shorturi/uri "http://www.dustingetz.com/"
-            :shorturi/owner (users "dustin.getz@foo.com")}
-        a2 {:shorturi/alias "bob"
-            :shorturi/uri "http://www.bobbillard.com/"
-            :shorturi/owner (users "bob.billard@foo.com")}
-        a3 {:shorturi/alias "bob2"
-            :shorturi/uri "http://www.bobbyyyyy.com/"
-            :shorturi/owner (users "bob.billard@foo.com")}]
-    @(d/transact @conn (data-with-dbid [a1 a2 a3])))
-
-
-  ;; what is bob's list of aliases - using back references
-  (def dbval (db @conn))
-  (def bob-eid ((eid-by-email dbval) "bob.billard@foo.com"))
-  (def bob-e (d/entity dbval bob-eid))
-  (d/touch bob-e)
-  (def bob-owned (:shorturi/_owner bob-e))
-  (map d/touch bob-owned)
-
-  (def users (eid-by-email dbval))
-
-  ;; or query directly
-  (q '[:find ?alias
-       :in $ ?owner
-       :where [?se :shorturi/alias ?alias]
-       [?se :shorturi/owner ?ue]
-       [?ue :user/email ?owner]]
-     dbval "bob.billard@foo.com")
-  ;;(map #(d/entity dbval (first %)) *1)
-  ;;(map d/touch *1)
-
-
-
-  (def dbval (db @conn))
-  (map #(q '[:find ?e :in $ ?alias :where [?e :shorturi/alias ?alias]] dbval %)
-       ["dustingetz" "bob"])
-  (map #(d/entity dbval (ffirst %)) *1)
-  (map #(d/touch %) *1)
-
-
-
-
-  (d/entity dbval (ffirst *1))
-  (d/touch *1)
-
+  (def txresult (upsert dbconn (data-with-dbid users)))
 
   )

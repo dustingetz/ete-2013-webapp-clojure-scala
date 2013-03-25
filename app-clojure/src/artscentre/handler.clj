@@ -22,9 +22,9 @@
   (GET   "/api/list-eligible-projects"   [] (views/index))
 
 
-  (GET   "/login"   [] (views/form))
-  (POST  "/login"   {form :params}    (do (prn form) (views/formSubmit form)))
-;;  (GET   "/:key"   [key] (views/redirect key))
+  ;; (GET   "/login"   [] (views/form))
+  ;; (POST  "/login"   {form :params}    (do (prn form) (views/formSubmit form)))
+  ;; (GET   "/:key"   [key] (views/redirect key))
 
   (route/files "/" {:root "../webapp"})
   (route/not-found "Not Found"))
