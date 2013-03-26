@@ -11,7 +11,7 @@
   (def server (jetty/run-jetty handler/ring-app {:port 3001 :join? false})))
 
 (defn start-dev-db []
-  (reset! appdb/conn (let [uri "datomic:mem://seattle"]
+  (reset! appdb/conn (let [uri "datomic:mem://artscentre"]
                   (d/delete-database uri)
                   (d/create-database uri)
                   (d/connect uri)))
