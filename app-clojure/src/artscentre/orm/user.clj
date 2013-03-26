@@ -4,7 +4,7 @@
 
 
 (defn read-by-name [dbval username]
-  (->> (qes '[:find ?e :in $ ?username
+  (->> (qe '[:find ?e :in $ ?username
               :where [?e :User/username ?username]]
             dbval username)
-       (mapv d/touch)))
+       (d/touch)))
