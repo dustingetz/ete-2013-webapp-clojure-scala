@@ -6,6 +6,7 @@ import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
 import artscentre.orm._
+import anorm.{UserInfoMapping, SkillsMapping, SkillsetMapping, ProjectMapping}
 import artscentre.models._
 import artscentre.models.Implicits._
 import play.api.db.DB

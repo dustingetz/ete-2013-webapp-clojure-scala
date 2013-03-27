@@ -10,6 +10,7 @@ object ApplicationBuild extends Build {
   val appDependencies = Seq(
     "jp.t2v" %% "play2.auth" % "0.9"
     ,"postgresql" % "postgresql" % "9.1-901.jdbc4"
+    ,"com.typesafe.slick" %% "slick" % "1.0.0"
     ,jdbc
     ,anorm
     //,"joda-time" % "joda-time" % "2.1"

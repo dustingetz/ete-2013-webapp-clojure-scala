@@ -1,7 +1,7 @@
 package artscentre
 
 import artscentre.models.Skill
-import artscentre.orm.SkillsMapping
+import orm.anorm.SkillsMapping
 import play.api.Play
 import play.api.test.FakeApplication
 import java.util.UUID.randomUUID
@@ -10,7 +10,7 @@ import play.api.db.DB
 
 object dataloader {
 
-  val skills = List(
+  final val skills = List(
     "Web Designer",
     "Objective C Developer",
     "Android Developer",
@@ -42,16 +42,17 @@ object dataloader {
   )
 
 
-  def main(args: Array[String]) {
+  def main(args: Array[String])
+  {
     implicit val app = FakeApplication()
     Play.start(app)
-
-    DB.withTransaction { dbconn =>
-
-      skills.foreach{ skillName => SkillsMapping.create(dbconn, randomUUID().toString, Skill(skillName)) }
-
+    try
+    {
+      DB.withTransaction
+      { dbconn =>
+        skills.foreach{ skillName => SkillsMapping.create(dbconn, randomUUID().toString, Skill(skillName)) }
+      }
     }
-
-    Play.stop()
+    finally Play.stop()
   }
 }

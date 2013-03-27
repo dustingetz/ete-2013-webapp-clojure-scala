@@ -1,4 +1,4 @@
-package artscentre.orm
+package artscentre.orm.anorm
 
 import anorm._
 
