@@ -45,26 +45,23 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   private implicit val skillPayloadFmt = Json.format[UserSkillPickerPayload]
 
 
-  // express with type system: what resources is this endpoint allowed to use?
-  // user, request, database.
-  // this helps us keep dependencies on a request or database isolated, so as much of our code
-  // as possible can run in contexts without these.
   def listSkillsUserPicker = authorizedAction(NormalUser) { user => implicit request =>
 
-    val (allSkills, userSkills) = DB.withConnection { implicit dbconn =>
+    val payload: Try[Set[UserSkillPickerPayload]] = DB.withConnection { implicit dbconn =>
 
-      val allSkills: Map[String, Skill] = SkillsMapping.all(dbconn)
-      val userSkills: Map[String, Skill] = SkillsMapping.forUser(dbconn, user)
-
-      (allSkills, userSkills)
+      for {
+        allSkills: Map[String, Skill] <- SkillsMapping.all(dbconn)
+        userSkills: Map[String, Skill] <- SkillsMapping.forUser(dbconn, user)
+      } yield allSkills.map { case (id, skill) =>
+        val enabled = userSkills.contains(id)
+        UserSkillPickerPayload(id, skill.name, enabled)
+      }.toSet
     }
 
-    val payload: Iterable[UserSkillPickerPayload] = allSkills.view.map { case (id, skill) =>
-      val enabled = userSkills.contains(id)
-      UserSkillPickerPayload(id, skill.name, enabled)
+    payload match {
+      case Failure(err) => InternalServerError(err.toString)
+      case Success(obj) => Ok(Json.toJson(obj))
     }
-
-    Ok(Json.toJson(payload))
   }
 
 

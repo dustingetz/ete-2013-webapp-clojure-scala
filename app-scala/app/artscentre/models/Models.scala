@@ -13,24 +13,30 @@ import java.text.SimpleDateFormat
  * can be case sensitive because in some cases we reuse the models as json payloads
  */
 
-case class User(username: String)   // is the userId part of the public model? is it used on the client?
-                                    // probably shouldnt be, as username has unique constraint
-
-case class UserInfo(firstName: String, lastName: String, email: String, username: String, created: java.util.Date)
-
-case class Skill(name: String)
-
-case class Project(name: String, owner: String, created: java.util.Date)
-
-case class ProjectInfo(name: String, owner: User, created: java.util.Date, members: Set[User], skills: Set[Skill])
+case class User(username: String)
 
 
+case class UserInfo(firstName: String,
+                    lastName: String,
+                    email: String,
+                    username: String,
+                    created: java.util.Date)
 
-//class User(val id: Int, val username: String)
-//class UserInfo(val id: Int, val firstname: String, val lastname: String, val email: String, val username: String, val created: Long)
-//class Skill(val id: Int, val name: String)
-//class Project(val id: Int, val name: String, val ownerId: Int, val created: Long)
-//class ProjectInfo(val id: Int, val name: String, val owner: User, val created: Long, val members: List[User], val skills: List[Skill])
+
+case class Skill(name: String,
+                 description: String)
+
+
+case class Project(name: String,
+                   owner: String,
+                   created: java.util.Date)
+
+
+case class ProjectInfo(name: String,
+                       owner: User,
+                       created: java.util.Date,
+                       members: Set[User],
+                       skills: Set[Skill])
 
 
 object Implicits {

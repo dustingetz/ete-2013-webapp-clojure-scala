@@ -50,7 +50,7 @@ object dataloader {
     {
       DB.withTransaction
       { dbconn =>
-        skills.foreach{ skillName => SkillsMapping.create(dbconn, randomUUID().toString, Skill(skillName)) }
+        skills.foreach{ skillName => SkillsMapping.create(dbconn, randomUUID().toString, Skill(skillName, "dummy description for %s".format(skillName))) }
       }
     }
     finally Play.stop()

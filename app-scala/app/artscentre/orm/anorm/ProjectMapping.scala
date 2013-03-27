@@ -2,23 +2,13 @@ package artscentre.orm.anorm
 
 import anorm.SqlParser._
 import anorm._
+import anorm.~
+import scala.util.Try
 import artscentre.models.{Project, ProjectInfo, User, Skill}
 import util.debug._
-import anorm.~
-import artscentre.models.User
-import artscentre.models.Project
-import artscentre.models.Skill
-import artscentre.models.ProjectInfo
-import scala.util.Try
 
 
 object ProjectMapping {
-
-  private val mapRawTuple =
-    get[String]("projects.id") ~
-    get[String]("projects.owner") ~
-    get[String]("projects.name") ~
-    get[java.util.Date]("projects.created") map(flatten)
 
   private val mapModel =
     get[String]("projects.owner") ~
@@ -99,12 +89,12 @@ object ProjectMapping {
 
   }
 
-  private def queryMembers(dbconn: java.sql.Connection, projectId: String): Try[Set[User]] = Try {
+  private def queryMembers(dbconn: java.sql.Connection, projectId: String): Try[Map[String, User]] = Try {
 
-    val mapUser =
+    val mapping =
       get[String]("u.id") ~
       get[String]("u.username") map {
-        case id~username => User(username)
+        case id~username => id -> User(username)
       }
 
     SQL(
@@ -114,30 +104,29 @@ object ProjectMapping {
         |WHERE m.project_id = {projectId}
       """.stripMargin)
       .on('projectId -> projectId)
-      .as(mapUser *)(dbconn)
-      .view.toSet
-
+      .as(mapping *)(dbconn)
+      .toMap
   }
 
-  def querySkills(dbconn: java.sql.Connection, projectId: String): Try[Set[Skill]] = Try {
+  def querySkills(dbconn: java.sql.Connection, projectId: String): Try[Map[String, Skill]] = Try {
 
-    val mapSkill =
+    val mapping =
       get[String]("s.id") ~
-      get[String]("s.name") map {
-        case id~name => Skill(name)
+      get[String]("s.name") ~
+      get[String]("s.description") map {
+        case id~name~desc => id -> Skill(name, desc)
       }
 
     SQL(
       """
-        |SELECT s.id, s.name FROM skills s
+        |SELECT s.id, s.name, s.description FROM skills s
         |INNER JOIN project_skills k ON s.id = k.skill_id
         |INNER JOIN projects p ON p.id = k.project_id
         |WHERE p.id = {projectId}
       """.stripMargin)
       .on('projectId -> projectId)
-      .as(mapSkill *)(dbconn)
-      .view.toSet
-
+      .as(mapping *)(dbconn)
+      .toMap
   }
 
 
@@ -152,12 +141,13 @@ object ProjectMapping {
 
     projects.map { case (projectId, project) =>
 
-      val owner = User(project.owner)
-      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
-      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+      (for {
+        members: Map[String, User] <- queryMembers(dbconn, projectId)
+        skills: Map[String, Skill] <- querySkills(dbconn, projectId)
+        owner = User(project.owner)
+      } yield (projectId -> ProjectInfo(project.name, owner, project.created, members.values.toSet, skills.values.toSet))).get
 
-      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
-    }.toMap
+    }
 
   }
 
@@ -174,12 +164,13 @@ object ProjectMapping {
 
     projects.map { case (projectId, project) =>
 
-      val owner = User(project.owner)
-      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
-      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+      (for {
+        members: Map[String, User] <- queryMembers(dbconn, projectId)
+        skills: Map[String, Skill] <- querySkills(dbconn, projectId)
+        owner = User(project.owner)
+      } yield (projectId -> ProjectInfo(project.name, owner, project.created, members.values.toSet, skills.values.toSet))).get
 
-      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
-    }.toMap
+    }
 
   }
 
@@ -198,13 +189,13 @@ object ProjectMapping {
 
     projects.map { case (projectId, project) =>
 
-      val owner = User(project.owner)
-      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
-      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+      (for {
+        members: Map[String, User] <- queryMembers(dbconn, projectId)
+        skills: Map[String, Skill] <- querySkills(dbconn, projectId)
+        owner = User(project.owner)
+      } yield (projectId -> ProjectInfo(project.name, owner, project.created, members.values.toSet, skills.values.toSet))).get
 
-      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
-    }.toMap
-
+    }
   }
 
 
@@ -230,12 +221,13 @@ object ProjectMapping {
 
     projects.map { case (projectId, project) =>
 
-      val owner = User(project.owner)
-      lazy val members: Set[User] = queryMembers(dbconn, projectId).get   // can throw outside a try if lazy - how to do this?
-      lazy val skills: Set[Skill] = querySkills(dbconn, projectId).get
+      (for {
+        members: Map[String, User] <- queryMembers(dbconn, projectId)
+        skills: Map[String, Skill] <- querySkills(dbconn, projectId)
+        owner = User(project.owner)
+      } yield (projectId -> ProjectInfo(project.name, owner, project.created, members.values.toSet, skills.values.toSet))).get
 
-      projectId -> ProjectInfo(project.name, owner, project.created, members, skills)
-    }.toMap
+    }
 
   }
 

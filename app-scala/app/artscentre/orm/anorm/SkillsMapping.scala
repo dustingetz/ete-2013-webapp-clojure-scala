@@ -3,24 +3,33 @@ package artscentre.orm.anorm
 import anorm.SqlParser._
 import anorm._
 import artscentre.models.Skill
+import scala.util.Try
 
 
 object SkillsMapping {
 
+  val mappingWithId =
+    get[String]("skills.id") ~
+    get[String]("skills.name") ~
+    get[String]("skills.description") map {
+      case id~name~desc => id -> Skill(name, desc)
+    }
 
+  val mapping =
+    get[String]("skills.name") ~
+    get[String]("skills.description") map {
+      case name~desc => Skill(name, desc)
+    }
 
-  type ID = String
+  def all(dbconn: java.sql.Connection): Try[Map[String, Skill]] = Try {
 
-  private val directMapping =
-    get[ID]("skills.id") ~
-    get[String]("skills.name") map(flatten)
+    SQL("SELECT skills.id, skills.name FROM skills")
+      .as(mappingWithId *)(dbconn)
+      .toMap
 
-  def all(dbconn: java.sql.Connection): Map[ID, Skill] = {
-    val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills").as(directMapping *)(dbconn)
-    raw.view.map { t => t._1 -> Skill(t._2) }.toMap
   }
 
-  def create(dbconn: java.sql.Connection, id: ID, obj: Skill) {
+  def create(dbconn: java.sql.Connection, id: String, obj: Skill): Try[Unit] = Try {
     val count = SQL("INSERT INTO skills VALUES ({id}, {name})")
       .on('id -> id,
           'name -> obj.name)
@@ -28,14 +37,15 @@ object SkillsMapping {
       // assert count==1
   }
 
-  def read(dbconn: java.sql.Connection, id: ID): Option[Skill] = {
-    val raw: List[(ID, String)] = SQL("SELECT skills.id, skills.name FROM skills WHERE users.id = {id}")
+
+  def read(dbconn: java.sql.Connection, id: String): Try[Option[Skill]] = Try {
+    SQL("SELECT skills.name, skills.description FROM skills WHERE skills.id = {id}")
       .on('id -> id)
-      .as(directMapping *)(dbconn)
-    raw.view.map { t => Skill(t._2) }.headOption
+      .as(mapping *)(dbconn)
+      .headOption
   }
 
-  def update(dbconn: java.sql.Connection, id: ID, obj: Skill) {
+  def update(dbconn: java.sql.Connection, id: String, obj: Skill): Try[Unit] = Try {
     val count = SQL("UPDATE skills SET name = {name} WHERE id = {id}")
       .on('id -> id,
           'name -> obj.name)
@@ -43,22 +53,22 @@ object SkillsMapping {
       // assert count == 1
   }
 
-  def delete(dbconn: java.sql.Connection, id: ID) {
+  def delete(dbconn: java.sql.Connection, id: String): Try[Unit] = Try {
     val count = SQL("DELETE FROM users WHERE id = {id}")
       .on('id -> id)
       .executeUpdate()(dbconn)
       //assert count == 1
   }
 
-  def forUser(dbconn: java.sql.Connection, userId: ID): Map[ID, Skill] = {
-    val raw: List[(ID, String)] = SQL(
+  def forUser(dbconn: java.sql.Connection, userId: String): Try[Map[String, Skill]] = Try {
+    SQL(
       """
-        |SELECT skills.id, skills.name FROM skills
+        |SELECT skills.id, skills.name, skills.description FROM skills
         |INNER JOIN skillsets
         |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
       """.stripMargin)
       .on('userId -> userId)
-      .as(directMapping *)(dbconn)
-    raw.view.map { t => t._1 -> Skill(t._2) }.toMap
+      .as(mappingWithId *)(dbconn)
+      .toMap
   }
 }
