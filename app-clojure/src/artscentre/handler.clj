@@ -12,7 +12,7 @@
 
 (defroutes app-routes
   (GET   "/api/whoami"                   [] (r/response (api/whoami)))
-  (GET   "/api/list-skills-user-picker"  [] (views/index))
+  (GET   "/api/list-skills-user-picker"  [] (r/response (api/listSkillsUserPicker)))
   (GET   "/api/update-user-skills"       [] (views/index))
   (GET   "/api/project-add-member"       [] (views/index))
   (GET   "/api/project-remove-member"    [] (views/index))

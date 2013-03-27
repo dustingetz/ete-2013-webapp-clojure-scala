@@ -25,8 +25,8 @@
   ;; (def dbval (db dbconn))
 
   (def skills (map (fn [x] {:Skill/skillname x}) skillList))
-
-  (def txresult (upsert dbconn (data-with-dbid skills)))
+)
+  (def txresult @(d/transact dbconn (data-with-dbid skills)))
 
   (def dbval (:db-before txresult))
   (def dbval (:db-after  txresult))
@@ -35,12 +35,11 @@
     (let [clojure (skill/read-by-name dbval "Clojure")
           scala   (skill/read-by-name dbval "Scala")
           datomic (skill/read-by-name dbval "Datomic")
-          java    (skill/read-by-name dbval "Java")
           haskell (skill/read-by-name dbval "Haskell")
           groovy  (skill/read-by-name dbval "Groovy")]
-      [{:User/username "dustin" :User/skills [clojure scala datomic java]}
-       {:User/username "jason"  :User/skills [scala haskell java groovy]}]))
+      [{:User/username "dustin" :User/skills [clojure scala datomic]}
+       {:User/username "jason"  :User/skills [scala haskell groovy]}]))
 
-  (def txresult (upsert dbconn (data-with-dbid users)))
+  (def txresult @(d/transact dbconn (data-with-dbid users)))
 
   )
