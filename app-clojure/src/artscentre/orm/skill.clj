@@ -14,15 +14,15 @@
 
 (defn read-by-name [dbval skillname]
   (qe '[:find ?skill :in $ ?skillname
-             :where [?skill :Skill/name ?skillname]]
+        :where [?skill :Skill/name ?skillname]]
             dbval skillname))
 
 
 (defn read-by-user [dbval username]
-  (qes '[:find ?skill :in $ ?username
-              :where [?user :User/username ?username]
-                     [?skill :User/skills]]
-            dbval username))
+  (qes '[:find ?skills :in $ ?username
+         :where [?user  :User/username ?username]
+                [?user  :User/skills ?skills]]
+       dbval username))
 
 
 

@@ -1,6 +1,9 @@
 (ns artscentre.api
-  (:use [datomic.api :only [db q] :as d])
-  (:require [artscentre.orm.skill :as skill]))
+  (:use [datomic.api :only [db q] :as d]
+        [platform.datomic-util])
+  (:require [artscentre.orm.skill :as skill]
+            [artscentre.orm.projectinfo :as projectinfo]))
+
 
 (defn whoami [user dbval]
   {:firstName "Dustin"
@@ -13,29 +16,20 @@
 
 
 
+(defrecord UserSkillPicker [id name enabled])
+
 
 (defn listSkillsUserPicker [user dbval]
 
-  (let [all-skills   (->> (skill/read-all dbval)
-                          (mapv d/touch))
-        user-skills  (->> (skill/read-by-user dbval)
-                          (mapv d/touch))]
+  (let [all-skills          (->> (skill/read-all dbval)
+                                 (mapv d/touch))
+        user-skills-by-eid  (->> (skill/read-by-user dbval user)
+                                 (mapv d/touch)
+                                 (by-eid))]
 
-    ;; (->> (map :Skill/name all-skills)
-    ;;      (into #{})
-    ;;      {:id id
-    ;;       :name name
-    ;;       :enabled true}
-    ;;      (partial contains? (map :Skill/name user-skills))
-    ;;      )
-
-    )
-
-
-
-
-
-  ;; get the skills for our user
-  ;; merge them into the desired payload shape
-  {}
-  )
+    (map (fn [entity]
+           (let [eid      (:db/id entity)
+                 name     (:Skill/name entity)
+                 enabled  (contains? user-skills-by-eid eid)]
+             (UserSkillPicker. eid name enabled)))
+         all-skills)))
