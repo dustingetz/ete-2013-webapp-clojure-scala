@@ -18,17 +18,23 @@
                 "Groovy"
                 "Haskell"])
 
+(defn load-skills [dbconn]
+  (let [skills (map (fn [x] {:Skill/name x}) skillList)
+        txresult @(d/transact dbconn (data-with-dbid skills))]
+    txresult))
+
+(defn read-skills [dbval & skills]
+  (map (partial skill/read-by-name dbval) skills))
+
 
 (defn load-fixtures [dbconn]
 
-  ;; (def dbconn @artscentre.db/conn)
-  ;; (def dbval (db dbconn))
+  (let [txresult (load-skills dbconn)
+        dbval (:db-after txresult)]
+    )
 
-  (def skills (map (fn [x] {:Skill/name x}) skillList))
-  (def txresult @(d/transact dbconn (data-with-dbid skills)))
 
-  (def dbval (:db-before txresult))
-  (def dbval (:db-after  txresult))
+
 
   (def users
     (let [clojure (skill/read-by-name dbval "Clojure")
@@ -42,3 +48,8 @@
   (def txresult @(d/transact dbconn (data-with-dbid users)))
 
   )
+
+;; (def dbconn @artscentre.db/conn)
+;; (def dbval (db dbconn))
+;; (def dbval (:db-before txresult))
+;; (def dbval (:db-after  txresult))
