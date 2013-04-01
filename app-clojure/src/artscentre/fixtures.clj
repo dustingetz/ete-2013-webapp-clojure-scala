@@ -24,8 +24,7 @@
   ;; (def dbconn @artscentre.db/conn)
   ;; (def dbval (db dbconn))
 
-  (def skills (map (fn [x] {:Skill/skillname x}) skillList))
-)
+  (def skills (map (fn [x] {:Skill/name x}) skillList))
   (def txresult @(d/transact dbconn (data-with-dbid skills)))
 
   (def dbval (:db-before txresult))
@@ -37,8 +36,8 @@
           datomic (skill/read-by-name dbval "Datomic")
           haskell (skill/read-by-name dbval "Haskell")
           groovy  (skill/read-by-name dbval "Groovy")]
-      [{:User/username "dustin" :User/skills [clojure scala datomic]}
-       {:User/username "jason"  :User/skills [scala haskell groovy]}]))
+      [{:User/username "dustin" :User/skills (map eid [clojure scala datomic])}
+       {:User/username "jason"  :User/skills (map eid [scala haskell groovy])}]))
 
   (def txresult @(d/transact dbconn (data-with-dbid users)))
 

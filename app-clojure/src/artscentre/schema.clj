@@ -11,7 +11,8 @@
                                        [:email      :string :unique]
                                        [:created    :instant]]))
 
-(def Skill (build-schema :Skill [[:skillname :string :unique]]))
+(def Skill (build-schema :Skill [[:name         :string :unique]
+                                 [:description  :string]]))
 
 (def Project (build-schema :Project [[:name     :string]
                                      [:owner    :ref]

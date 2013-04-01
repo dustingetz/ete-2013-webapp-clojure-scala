@@ -4,18 +4,18 @@
 
 
 (defn read-all [dbval]
-  (->> (qes '[:find ?e :where [?e :Skill/skillname]] dbval)
+  (->> (qes '[:find ?e :where [?e :Skill/name]] dbval)
        (mapv d/touch)))
 
 
 (defn read-by-name [dbval skillname]
   (->> (qe '[:find ?skill :in $ ?skillname
-              :where [?skill :Skill/skillname ?skillname]]
+              :where [?skill :Skill/name ?skillname]]
             dbval skillname)
        (d/touch)))
 
 
-(defn read-for-user [dbval username]
+(defn read-by-user [dbval username]
   (->> (qes '[:find ?skill :in $ ?username
               :where [?user :User/username ?username]
                      [?skill :User/skills]]

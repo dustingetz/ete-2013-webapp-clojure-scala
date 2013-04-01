@@ -4,14 +4,25 @@
         [artscentre.datomic-util]))
 
 
+
+
+
+
+
+
 (def Skill (build-schema :Skill [[:name         :string :unique]
                                  [:description  :string]]))
+
+
 
 
 (def ProjectInfo (build-schema :ProjectInfo [[:name     :string :unique]
                                              [:owner    :string]
                                              [:created  :instant]
                                              [:skills   :ref :many]]))
+
+
+
 
 
 (defn read-all-projects [dbval]
@@ -87,7 +98,7 @@
                      :ProjectInfo/created (java.util.Date.)
                      :ProjectInfo/skills [java postgresql]}]
 
-    (def txresult @(d/transact dbconn (data-with-dbid [artscentre tinyurl]))))
+    (def txresult @(d/transact dbconn (data-with-dbid [artscentre tinyurl]a))))
 
 
 
@@ -95,10 +106,11 @@
   (def dbval (:db-after  txresult))
 
   (->> (read-all-projects dbval)
-       (first)
-       (d/touch)
-       (:ProjectInfo/skills)
-       (mapv d/touch))
+     (first)
+     (d/touch)
+     (:ProjectInfo/skills)
+     (mapv d/touch)
+     )
 
   )
 

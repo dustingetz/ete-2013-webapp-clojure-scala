@@ -17,8 +17,4 @@
   [data]
   (map #(merge {:db/id (d/tempid :db.part/user)} %1) data))
 
-
-(defn upsert
-  "o must match the external Skill schema (no db/id)"
-  [dbconn obj]
-  @(d/transact dbconn (data-with-dbid obj)))
+(defn eid [e] (:db/id e))
