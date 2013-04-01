@@ -1,8 +1,8 @@
 (ns artscentre.api
-  (:use [artscentre.orm.skill :as skill]
-        [datomic.api :only [db q] :as d]))
+  (:use [datomic.api :only [db q] :as d])
+  (:require [artscentre.orm.skill :as skill]))
 
-(defn whoami [dbval]
+(defn whoami [user dbval]
   {:firstName "Dustin"
    :lastName "Getz"
    :email "dustin.getz@gmail.com"
@@ -14,12 +14,12 @@
 
 
 
-(defn listSkillsUserPicker [dbval]
+(defn listSkillsUserPicker [user dbval]
 
   (let [all-skills   (->> (skill/read-all dbval)
-                          (d/touch))
+                          (mapv d/touch))
         user-skills  (->> (skill/read-by-user dbval)
-                          (d/touch))]
+                          (mapv d/touch))]
 
     ;; (->> (map :Skill/name all-skills)
     ;;      (into #{})

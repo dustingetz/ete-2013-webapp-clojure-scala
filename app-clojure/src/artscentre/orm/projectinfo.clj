@@ -5,7 +5,7 @@
 
 
 (def schema (build-schema :ProjectInfo [[:name     :string :unique]
-                                        [:owner    :string]
+                                        [:owner    :ref]
                                         [:created  :instant]
                                         [:skills   :ref :many]]))
 

@@ -1,7 +1,8 @@
 (ns artscentre.handler
   (:use [compojure.core]
         [ring.middleware.json]
-        [platform.datomic-ring :only [*dbval* *dbconn* wrap-datomic]])
+        [platform.datomic-ring :only [*dbval* *dbconn* wrap-datomic]]
+        [platform.ring-auth :only [*user* wrap-auth]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [datomic.api :only [db q] :as d]
@@ -13,8 +14,8 @@
 
 
 (defroutes app-routes
-  (GET   "/api/whoami"                   [] (r/response (api/whoami *dbval*)))
-  (GET   "/api/list-skills-user-picker"  [] (r/response (api/listSkillsUserPicker *dbval*)))
+  (GET   "/api/whoami"                   [] (r/response (api/whoami *user* *dbval*)))
+  (GET   "/api/list-skills-user-picker"  [] (r/response (api/listSkillsUserPicker *user* *dbval*)))
   (GET   "/api/update-user-skills"       [] (r/response {}))
   (GET   "/api/project-add-member"       [] (r/response {}))
   (GET   "/api/project-remove-member"    [] (r/response {}))
@@ -30,6 +31,7 @@
 
 (def ring-app (-> (handler/api app-routes)
                   (partial wrap-datomic artscentre.db/conn)
+                  wrap-auth
                   stacktrace/wrap-stacktrace
                   wrap-json-body
                   wrap-json-response
