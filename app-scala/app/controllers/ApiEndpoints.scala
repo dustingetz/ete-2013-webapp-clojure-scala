@@ -1,17 +1,20 @@
 package controllers
 
+import anorm.SqlParser._
+import anorm._
+import anorm.~
 import play.api._
+import play.api.db.DB
 import play.api.mvc._
 import play.api.libs.json._
 import jp.t2v.lab.play2.auth.Auth
 import controllers.auth.{NormalUser, ServiceAuthConfig}
-import artscentre.orm._
-import anorm.{UserInfoMapping, SkillsMapping, SkillsetMapping, ProjectMapping}
+import java.util.UUID.randomUUID
+import scala.util.{Try, Failure, Success}
+
 import artscentre.models._
 import artscentre.models.Implicits._
-import play.api.db.DB
-import java.util.UUID.randomUUID
-import scala.util.{Success, Try, Failure}
+import artscentre.orm.anorm._
 
 
 object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
@@ -41,28 +44,71 @@ object ApiEndpoints extends Controller with Auth with ServiceAuthConfig {
   }
 
 
-  private case class UserSkillPickerPayload(id: String, name: String, enabled: Boolean)
-  private implicit val skillPayloadFmt = Json.format[UserSkillPickerPayload]
+  private implicit val skillPayloadFmt = Json.format[UserSkillPicker]
+
+  case class UserSkillPicker(id: String,
+                             name: String,
+                             enabled: Boolean)
+
+
 
 
   def listSkillsUserPicker = authorizedAction(NormalUser) { user => implicit request =>
 
-    val payload: Try[Set[UserSkillPickerPayload]] = DB.withConnection { implicit dbconn =>
-
+    val x: Try[List[UserSkillPicker]] = DB.withConnection { implicit dbconn =>
       for {
         allSkills: Map[String, Skill] <- SkillsMapping.all(dbconn)
         userSkills: Map[String, Skill] <- SkillsMapping.forUser(dbconn, user)
-      } yield allSkills.map { case (id, skill) =>
-        val enabled = userSkills.contains(id)
-        UserSkillPickerPayload(id, skill.name, enabled)
-      }.toSet
+      }  yield {
+        allSkills.map { case (id, skill) =>
+          val enabled = userSkills.contains(id)
+          UserSkillPicker(id, skill.name, enabled)
+        }
+      }.toList
     }
 
-    payload match {
-      case Failure(err) => InternalServerError(err.toString)
+    x match {
+      case Failure(e) => InternalServerError(e.toString)
       case Success(obj) => Ok(Json.toJson(obj))
     }
+
   }
+
+
+  object SkillsMapping {
+
+    val mappingWithId =
+      get[String]("skills.id") ~
+      get[String]("skills.name") ~
+      get[String]("skills.description") map {
+        case id~name~desc => id -> Skill(name, desc)
+      }
+
+    def all(dbconn: java.sql.Connection): Try[Map[String, Skill]] = Try {
+
+      SQL("SELECT skills.id, skills.name FROM skills")
+        .as(mappingWithId *)(dbconn)
+        .toMap
+
+    }
+
+    def forUser(dbconn: java.sql.Connection, userId: String): Try[Map[String, Skill]] = Try {
+
+      SQL(
+        """
+          SELECT skills.id, skills.name, skills.description FROM skills
+          INNER JOIN skillsets
+          ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
+        """)
+        .on('userId -> userId)
+        .as(mappingWithId *)(dbconn)
+        .toMap
+
+    }
+  }
+
+
+
 
 
   def updateUserSkills = authorizedAction(parse.json, NormalUser) { user => implicit request =>

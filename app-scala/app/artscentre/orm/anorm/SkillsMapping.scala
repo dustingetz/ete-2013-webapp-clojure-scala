@@ -8,17 +8,28 @@ import scala.util.Try
 
 object SkillsMapping {
 
-  val mappingWithId =
-    get[String]("skills.id") ~
-    get[String]("skills.name") ~
-    get[String]("skills.description") map {
-      case id~name~desc => id -> Skill(name, desc)
-    }
+
+  /*
+    CREATE TABLE skills (
+      id VARCHAR(36) NOT NULL,
+      name character varying(128) not null
+    );
+  */
+
+//  case class Skill(id: String, name: String)
+
 
   val mapping =
     get[String]("skills.name") ~
     get[String]("skills.description") map {
       case name~desc => Skill(name, desc)
+    }
+
+  val mappingWithId =
+    get[String]("skills.id") ~
+      get[String]("skills.name") ~
+      get[String]("skills.description") map {
+      case id~name~desc => id -> Skill(name, desc)
     }
 
   def all(dbconn: java.sql.Connection): Try[Map[String, Skill]] = Try {
@@ -28,6 +39,22 @@ object SkillsMapping {
       .toMap
 
   }
+
+  def forUser(dbconn: java.sql.Connection, userId: String): Try[Map[String, Skill]] = Try {
+    SQL(
+      """
+        |SELECT skills.id, skills.name, skills.description FROM skills
+        |INNER JOIN skillsets
+        |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
+      """.stripMargin)
+      .on('userId -> userId)
+      .as(mappingWithId *)(dbconn)
+      .toMap
+  }
+
+
+
+
 
   def create(dbconn: java.sql.Connection, id: String, obj: Skill): Try[Unit] = Try {
     val count = SQL("INSERT INTO skills VALUES ({id}, {name})")
@@ -60,15 +87,5 @@ object SkillsMapping {
       //assert count == 1
   }
 
-  def forUser(dbconn: java.sql.Connection, userId: String): Try[Map[String, Skill]] = Try {
-    SQL(
-      """
-        |SELECT skills.id, skills.name, skills.description FROM skills
-        |INNER JOIN skillsets
-        |ON skills.id = skillsets.skill_id AND skillsets.user_id = {userId}
-      """.stripMargin)
-      .on('userId -> userId)
-      .as(mappingWithId *)(dbconn)
-      .toMap
-  }
+
 }
