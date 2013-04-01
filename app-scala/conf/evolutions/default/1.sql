@@ -16,8 +16,9 @@ ALTER TABLE users ADD CONSTRAINT users_pk0 PRIMARY KEY (id);
 
 CREATE TABLE skills
 (
-  id VARCHAR(36) NOT NULL,
-  name character varying(128) not null
+  id            VARCHAR(36) NOT NULL,
+  name          VARCHAR NOT NULL
+  description   VARCHAR NOT NULL
 );
 
 ALTER TABLE skills ADD CONSTRAINT skills_pk0 PRIMARY KEY (id);
