@@ -1,7 +1,7 @@
 (ns artscentre.handler
   (:use [compojure.core]
         [ring.middleware.json]
-        [artscentre.datomic-ring :only [*dbval* *dbconn* wrap-datomic]])
+        [platform.datomic-ring :only [*dbval* *dbconn* wrap-datomic]])
   (:require [compojure.handler :as handler]
             [compojure.route :as route]
             [datomic.api :only [db q] :as d]
@@ -23,10 +23,6 @@
   (GET   "/api/list-joined-projects"     [] (r/response {}))
   (GET   "/api/list-eligible-projects"   [] (r/response {}))
 
-
-  ;; (GET   "/login"   [] (views/form))
-  ;; (POST  "/login"   {form :params}    (do (prn form) (views/formSubmit form)))
-  ;; (GET   "/:key"   [key] (views/redirect key))
 
   (route/files "/" {:root "../webapp"})
   (route/not-found "Not Found"))

@@ -1,51 +1,50 @@
 (ns artscentre.fixtures
     (:use [datomic.api :only [db q] :as d]
-          [artscentre.datomic-util]
-          [artscentre.orm.skill :as skill]))
+          [platform.datomic-util])
+    (:require [artscentre.orm.skill :as skill]
+              [artscentre.orm.projectinfo :as projectinfo]))
 
 
-;;(defn dump-eid [eids] null)
-;;(map #(d/entity dbval (first %)) *1)
-;;(map #(d/touch %) *1)
+(def skill-list [{:Skill/name        "Clojure"
+                  :Skill/description "omg parens"}
 
-(def skillList ["Web Designer"
-                "Objective C"
-                "Android"
-                "Scala"
-                "Clojure"
-                "Datomic"
-                "Java"
-                "Groovy"
-                "Haskell"])
+                 {:Skill/name        "Datomic"
+                  :Skill/description "i got 99 proiblems but state ain't one"}
 
-(defn load-skills [dbconn]
-  (let [skills (map (fn [x] {:Skill/name x}) skillList)
-        txresult @(d/transact dbconn (data-with-dbid skills))]
-    txresult))
+                 {:Skill/name        "Scala"
+                  :Skill/description "what is this OO malarky (just kidding)"}
 
-(defn read-skills [dbval & skills]
-  (map (partial skill/read-by-name dbval) skills))
+                 {:Skill/name        "Java"
+                  :Skill/description "every empire eventually falls"}
+
+                 {:Skill/name        "Postgresql"
+                  :Skill/description "sometimes it's cool to be old"}])
 
 
 (defn load-fixtures [dbconn]
 
-  (let [txresult (load-skills dbconn)
-        dbval (:db-after txresult)]
-    )
+  (let [txresult    @(d/transact dbconn (data-with-dbid skill-list))
+        dbval       (:db-after txresult)
+        skills      (->> (map (partial skill/read-by-name dbval) ["Clojure" "Scala" "Datomic" "Java" "Postgresql"])
+                         (map (fn [entity]
+                                (let [eid  (:db/id entity)
+                                      name (:Skill/name entity)]
+                                  [name eid])))
+                         (into {}))
 
+        artscentre  {:ProjectInfo/name    "Artscentre"
+                     :ProjectInfo/owner   "Dustin"
+                     :ProjectInfo/created (java.util.Date.)
+                     :ProjectInfo/skills  [(skills "Clojure")
+                                           (skills "Datomic")]}
 
+        tinyurl     {:ProjectInfo/name    "Tinyurl"
+                     :ProjectInfo/owner   "Kevin"
+                     :ProjectInfo/created (java.util.Date.)
+                     :ProjectInfo/skills  [(skills "Java")
+                                           (skills "Postgresql")]}]
 
-
-  (def users
-    (let [clojure (skill/read-by-name dbval "Clojure")
-          scala   (skill/read-by-name dbval "Scala")
-          datomic (skill/read-by-name dbval "Datomic")
-          haskell (skill/read-by-name dbval "Haskell")
-          groovy  (skill/read-by-name dbval "Groovy")]
-      [{:User/username "dustin" :User/skills (map eid [clojure scala datomic])}
-       {:User/username "jason"  :User/skills (map eid [scala haskell groovy])}]))
-
-  (def txresult @(d/transact dbconn (data-with-dbid users)))
+    @(d/transact dbconn (data-with-dbid [artscentre tinyurl])))
 
   )
 

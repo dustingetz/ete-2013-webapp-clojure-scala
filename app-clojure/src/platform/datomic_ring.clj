@@ -1,4 +1,4 @@
-(ns artscentre.datomic-ring
+(ns platform.datomic-ring
   (:use [datomic.api :only [db q] :as d]))
 
 ;; modified from bobby's datomic helpers: https://gist.github.com/bobby/3150938

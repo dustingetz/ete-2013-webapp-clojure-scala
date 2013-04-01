@@ -9,8 +9,12 @@
    :username "dustin"
    :created (java.util.Date.)})
 
+
+
+
+
+
 (defn listSkillsUserPicker [dbval]
-  ;; get all the skills
 
   (let [all-skills   (->> (skill/read-all dbval)
                           (d/touch))

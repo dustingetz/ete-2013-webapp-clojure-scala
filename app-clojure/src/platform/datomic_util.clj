@@ -1,4 +1,4 @@
-(ns artscentre.datomic-util
+(ns platform.datomic-util
   (:use [datomic.api :only [db q] :as d]))
 
 

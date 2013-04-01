@@ -1,6 +1,11 @@
 (ns artscentre.orm.skill
   (:use [datomic.api :only [db q] :as d]
-        [artscentre.datomic-util]))
+        [datomico.core :only [build-schema]]
+        [platform.datomic-util]))
+
+
+(def schema (build-schema :Skill [[:name         :string :unique]
+                                  [:description  :string]]))
 
 
 (defn read-all [dbval]
@@ -10,7 +15,7 @@
 
 (defn read-by-name [dbval skillname]
   (->> (qe '[:find ?skill :in $ ?skillname
-              :where [?skill :Skill/name ?skillname]]
+             :where [?skill :Skill/name ?skillname]]
             dbval skillname)
        (d/touch)))
 

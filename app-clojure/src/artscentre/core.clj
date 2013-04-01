@@ -3,12 +3,16 @@
   (:require [ring.adapter.jetty :as jetty]
             [artscentre.handler :as handler]
             [artscentre.db :as appdb]
-            [artscentre.schema :as schema]
+            [artscentre.orm.projectinfo :as projectinfo]
+            [artscentre.orm.skill :as skill]
             [artscentre.fixtures :as fixtures]))
 
 
 (defn -main [& m]
-  (def server (jetty/run-jetty handler/ring-app {:port 3001 :join? false})))
+  (def server (jetty/run-jetty handler/ring-app {:port 3001 :join? false}))
+  (start-dev-db)
+  (load-fixtures (@appdb/conn))
+  )
 
 (defn start-dev-db []
   (reset! appdb/conn (let [uri "datomic:mem://artscentre"]
@@ -16,17 +20,28 @@
                   (d/create-database uri)
                   (d/connect uri)))
 
-  (let [schema-tx (concat schema/User
-                          schema/UserInfo
-                          schema/Skill
-                          schema/Project
-                          schema/ProjectInfo)]
+  (let [schema-tx (concat skill/schema
+                          projectinfo/schema)]
     @(d/transact @appdb/conn schema-tx))
 
   )
 
-;; (-main)
-;; (start-dev-db)
-;; (fixtures/load-fixtures @appdb/conn)
-;; (.stop server)
-;; (.start server)
+
+
+
+(comment
+  ;; Some common REPL operations
+
+  (-main)
+
+  (start-dev-db)
+  (fixtures/load-fixtures @appdb/conn)
+
+  (.stop server)
+  (.start server)
+
+  (->> (projectinfo/read-all (db @appdb/conn))
+       (first)
+       (:ProjectInfo/skills)
+       (mapv d/touch))
+  )
