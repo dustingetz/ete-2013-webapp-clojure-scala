@@ -22,7 +22,7 @@
   (GET   "/api/delete-project"           [] (r/response {}))
   (GET   "/api/list-owned-projects"      [] (r/response {}))
   (GET   "/api/list-joined-projects"     [] (r/response {}))
-  (GET   "/api/list-eligible-projects"   [] (r/response {}))
+  (GET   "/api/list-eligible-projects"   [] (r/response (api/list-elligible-projects *user* *dbval*)))
 
 
   (route/files "/" {:root "../webapp"})

@@ -33,3 +33,29 @@
                  enabled  (contains? user-skills-by-eid eid)]
              (UserSkillPicker. eid name enabled)))
          all-skills)))
+
+
+
+
+
+(defn list-elligible-projects
+  "proejcts which the user has a matching skill, but is not a member"
+  [user dbval]
+
+  (let [ps (projectinfo/read-elligible-projects user dbval)]
+    (do
+      (mapv d/touch ps)
+      (mapv :ProjectInfo/skills ps)
+      (mapv :ProjectInfo/members ps))
+    ps))
+
+
+(comment
+
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+
+  (list-elligible-projects "dustin" dbval)
+
+
+  )

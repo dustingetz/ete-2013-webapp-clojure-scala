@@ -39,8 +39,8 @@
   (start-dev-db)
   (fixtures/load-fixtures @appdb/conn)
 
-  (def dbconn @artscentre.db/conn)
-  (def dbval (db dbconn))
+  (def dbconn artscentre.db/conn)
+  (def dbval (db @dbconn))
   (def dbval (:db-before txresult))
   (def dbval (:db-after  txresult))
 

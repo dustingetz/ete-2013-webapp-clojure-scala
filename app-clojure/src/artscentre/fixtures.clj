@@ -36,7 +36,7 @@
                   :db/id          #db/id[:db.part/user -1000008]}
 
                  {:User/username  "jason"
-                  :User/skills    [scala java postgresql]
+                  :User/skills    [scala java postgresql datomic]
                   :db/id          #db/id[:db.part/user -1000009]}])
 
 
@@ -47,12 +47,16 @@
 
 (def projects   [{:ProjectInfo/name     "Artscentre"
                   :ProjectInfo/owner    jason
+                  :ProjectInfo/members  [jason]
                   :ProjectInfo/created  (java.util.Date.)
+                  :ProjectInfo/skills   [clojure datomic]
                   :db/id                #db/id[:db.part/user -1000006]}
 
                  {:ProjectInfo/name     "Tinyurl"
                   :ProjectInfo/owner    dustin
+                  :ProjectInfo/members  [dustin]
                   :ProjectInfo/created  (java.util.Date.)
+                  :ProjectInfo/skills   [java postgresql]
                   :db/id                #db/id[:db.part/user -1000007]}])
 
 

@@ -23,10 +23,3 @@
          :where [?user  :User/username ?username]
                 [?user  :User/skills ?skills]]
        dbval username))
-
-
-
-
-;; (read-all (db @artscentre.db/conn))
-;; (read-by-name (db @artscentre.db/conn) "Web Designer")
-;; (read-for-user (db @artscentre.db/conn) "dustin")
