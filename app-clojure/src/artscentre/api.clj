@@ -34,6 +34,17 @@
              (UserSkillPicker. eid name enabled)))
          all-skills)))
 
+(comment
+
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+
+  (skill/read-all dbval)
+  (skill/read-by-user dbval user)
+
+  )
+
 
 
 
@@ -49,6 +60,16 @@
         (dorun (map d/touch (:ProjectInfo/members p)))
         (dorun (map d/touch (:ProjectInfo/skills p)))))
     ps))
+
+(comment
+
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+
+  (projectinfo/read-elligible-projects user dbval)
+
+  )
 
 
 (comment

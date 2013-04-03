@@ -17,6 +17,12 @@
               :where [?e :ProjectInfo/name]] dbval)
        (mapv d/touch)))
 
+(comment
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+  (read-all dbval)
+  )
 
 (defn- read-projects-matching-user-skills [user dbval]
   (qes '[:find ?project :in $ ?username
@@ -26,11 +32,27 @@
                 ]
        dbval user))
 
+(comment
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+  (read-projects-matching-user-skills user dbval)
+  )
+
 (defn- read-projects-for-user [user dbval]
   (qes '[:find ?project :in $ ?username
          :where [ ?user :User/username ?username ]
                 [ ?project :ProjectInfo/members ?user]]
        dbval user))
+
+(comment
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+  (read-projects-for-user user dbval)
+  )
+
+
 
 (defn read-elligible-projects [user dbval]
   (let [projects   (read-projects-matching-user-skills user dbval)
@@ -42,9 +64,17 @@
          (map d/entity))
     ))
 
+(comment
+  (def dbconn artscentre.db/conn)
+  (def dbval (d/db @dbconn))
+  (def user "dustin")
+  (read-elligible-projects user dbval)
+  )
 
 
-(comment ; for testing in a repl
+
+
+(comment
 
   (def dbconn artscentre.db/conn)
   (def dbval (d/db @dbconn))
