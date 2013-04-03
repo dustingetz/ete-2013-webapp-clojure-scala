@@ -43,10 +43,11 @@
   [user dbval]
 
   (let [ps (projectinfo/read-elligible-projects user dbval)]
-    (do
-      (mapv d/touch ps)
-      (mapv :ProjectInfo/skills ps)
-      (mapv :ProjectInfo/members ps))
+    (doseq [p ps]
+      (do
+        (d/touch p)
+        (dorun (map d/touch (:ProjectInfo/members p)))
+        (dorun (map d/touch (:ProjectInfo/skills p)))))
     ps))
 
 
@@ -56,6 +57,7 @@
   (def dbval (d/db @dbconn))
 
   (list-elligible-projects "dustin" dbval)
+  (list-elligible-projects "jason" dbval)
 
 
   )

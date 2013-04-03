@@ -37,8 +37,10 @@
         myprojects (read-projects-for-user user dbval)]
 
     ;; subtract out any projects we're already in
-    (set/difference (into #{} (map :db/id projects))
-                    (into #{} (map :db/id myprojects)))))
+    (->> (set/difference (into #{} (map :db/id projects))
+                         (into #{} (map :db/id myprojects)))
+         (map d/entity))
+    ))
 
 
 
